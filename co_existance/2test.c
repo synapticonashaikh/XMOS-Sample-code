@@ -1,8 +1,10 @@
 //includes
 #include "cHeader.h"
 
+
 //hash definition
 #if (__ENDS_C_FUNCTIONALITY == SET)
+
 
 //function definition
 int CFunction1(void)
@@ -33,6 +35,21 @@ char * CFunction3(char *d)
 return c;
 }
 
+ __attribute__(( fptrgroup("my_functions") ))
+void fun(int a)
+{
+    printf("Value of a is %d\n", a);
+}
+
+
+void CFunctionPointer(void)
+{
+
+     __attribute__(( fptrgroup("my_functions") ))void (*fun_ptr)(int) = &fun;
+
+    (*fun_ptr)(10);
+
+}
 
 
 

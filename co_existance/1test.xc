@@ -5,6 +5,7 @@
 //Start of the code
 int main ( )
 {
+     CFunctionPointer();
 
     par //parallel processing
     {  
@@ -13,6 +14,7 @@ int main ( )
             CFunction1();
             CFunction2();
             printf("%s\n\r",CFunction3(" HOLA!")); 
+            CFunctionPointer();
       #endif
     }
 
@@ -20,8 +22,8 @@ int main ( )
     {
       //parallel processing of C++ function is not possible
       #if(__ENDS_CPP_FUNCTIONALITY == SET) 
-            CPPFunction1();
-            //CPPFunction2();                   
+         //   CPPFunction1();
+          //CPPFunction2();                   
       #endif         
     }                       
 
