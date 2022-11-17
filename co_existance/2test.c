@@ -35,20 +35,23 @@ char * CFunction3(char *d)
 return c;
 }
 
- __attribute__(( fptrgroup("my_functions") ))
+ __attribute__(( fptrgroup("G1") ))
 void fun(int a)
-{
-    printf("Value of a is %d\n", a);
-}
+{ printf("Value of a is %d\n", a); }
+
+ __attribute__(( fptrgroup("X1") ))
+void fun1(int a)
+{ printf("Value of a is %d\n", a); }
 
 
 void CFunctionPointer(void)
 {
-
-     __attribute__(( fptrgroup("my_functions") ))void (*fun_ptr)(int) = &fun;
+    
+ __attribute__(( fptrgroup("G1") ))void (*fun_ptr)(int) = &fun;
+__attribute__(( fptrgroup("G1") ))void (*fun_ptr1)(int) = &fun1;      
 
     (*fun_ptr)(10);
-
+    (*fun_ptr1)(20);
 }
 
 
