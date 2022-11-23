@@ -1,19 +1,16 @@
 //includes
 #include "xcHeader.h"
 
- 
 //Start of the code
 int main ( )
 {
-     CFunctionPointer();
-
     par //parallel processing
     {  
       //parallel processing of C and C++ function is not possible  
       #if (__ENDS_C_FUNCTIONALITY == SET)
             CFunction1();
-            CFunction2();
-            printf("%s\n\r",CFunction3(" HOLA!")); 
+            CFunction2();              
+            printf("%s\n\r",CFunction3(" Hola")); 
             CFunctionPointer();
       #endif
     }

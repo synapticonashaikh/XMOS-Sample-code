@@ -96,8 +96,9 @@
  * ----------------------------------------------------------------------------
 */
 
-   interface my_interface {   void fA ( int x , int y ); void fB ( float x );  };
 
+  interface my_interface { void fA ( int x , int y ); void fB ( float x );  };
+  interface MicroPythonInterface { char * unsafe FnExecute( char * unsafe string); };
 
 
 /* ----------------------------------------------------------------------------
@@ -105,12 +106,35 @@
  * ----------------------------------------------------------------------------
 */
 
+unsafe void FnSender(client interface MicroPythonInterface mpi)
+{
+    char * unsafe ret = mpi.FnExecute("print('Hello')");
+    printf("SUCCESS: %s\n\r",ret); 
+}
+
+unsafe void FnReceiver(server interface MicroPythonInterface mpi)
+{
+    while (SET)
+    {
+      select 
+      {
+          case mpi.FnExecute(char * unsafe string) -> char * unsafe ret:
+          printf ("RECEIVED= %s\n\r",string);  
+          ret = "code is working!";
+          break ;
+          default: break; // to make the select non-blockable 
+      }
+    } 
+}
+
+
 void task1(client interface my_interface i)
 {
+
     // 'i ' is the client end of the connection ,
     // let ' s communicate with the other end .
     i.fA(5 , 10) ;      
-    i.fB(10.10) ;    
+    i.fB(10.10 ) ;    
 
 }
 
@@ -134,6 +158,9 @@ void task2(server interface my_interface i)
 }
 
 
+
+
+
 /* ----------------------------------------------------------------------------
  *                           important command
  * ----------------------------------------------------------------------------
@@ -152,12 +179,18 @@ void task2(server interface my_interface i)
 int main ( void )
 {
 
-    interface my_interface i;
-    par 
-    {
-        task1 ( i ) ;
-        task2 ( i ) ;
-    }
-
-return RESET ;
+   // interface my_interface i;
+  interface MicroPythonInterface mpi;
+  unsafe
+        {    
+          par 
+          {
+              // task1 ( i );
+              // task2 ( i );
+            
+                FnSender(mpi);
+                FnReceiver(mpi);
+          }
+        }
+  return RESET ;
 }

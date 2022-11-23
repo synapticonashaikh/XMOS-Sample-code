@@ -25,13 +25,12 @@ return 0 ;
 }
 
 //function definition
+
 char * CFunction3(char *d)
 {
     static char c[40] = "This is just for the test purpose!";
     for (int abc = 0 ; abc < 0x4FF ; abc++ );
     strcat(c,d);
-    printf("in pointer return function!\n\r");
-
 return c;
 }
 

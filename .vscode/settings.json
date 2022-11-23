@@ -4,6 +4,7 @@
         "*.xc": "cpp",
         "random": "cpp",
         "cheader.h": "c",
-        "zdefinitions.h": "c"
+        "zdefinitions.h": "c",
+        "string": "cpp"
     }
 }
