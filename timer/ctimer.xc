@@ -1,3 +1,4 @@
+
 /**************************************************************************************
  **************************************************************************************
  ______________________________________________________________________________________
@@ -85,71 +86,125 @@
  *                           Includes
  * ----------------------------------------------------------------------------
 */
-     
-	/*Standard Header files*/
-	#include "header.h"
-        
+
+	/**********Standard Header Files*********/		
+  #include "header.h"
 
 /* ----------------------------------------------------------------------------
  *                          GLOBAL VARIABLE DECLARATION
  * ----------------------------------------------------------------------------
 */
 
-
 /* ----------------------------------------------------------------------------
  *                           Fnction Definitions
  * ----------------------------------------------------------------------------
 */
 
-void task1 (chanend c) 
-{
-    UNION8 UN; UN.ui64 = RESET;
-    
-    while (SET)
-    {    
-        c <: UN.ui64;
-        delay_milliseconds(1000); //this function does not work in simulation
-        UN.ui64++;
-    }
-}
-void task2 (chanend c) 
-{
-    while (SET)
-    {
-        select 
-        {
-            case c :> uint64_t UN:
-            printf("int value = %d\n",UN); 
-            break ;
-            default: break; // to make the select non-blockable 
-        }     
-    }
-}
-
+    /*set the timer for 100ns */
+    timer    stTime; 
 
 /* ----------------------------------------------------------------------------
  *                           important command
  * ----------------------------------------------------------------------------
 */
-	//xcc -target=XCORE-200-EXPLORER file_location/hello.c -o output_location/helloworld.xe
+	//xcc -target=XCORE-200-EXPLORER file_location/timer1sec.xc -o output_location/timer1sec.xe
 	//xsim output_location/helloworld.xe
 	//xrun --io output_location/helloworld.xe
 
 /***********************************************************************
  * Function Name: main 
- * Arguments	: void
+ * Arguments	  : void
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-int main ( ) 
+inline void Fndelay1us(void)
 {
+   uint64_t uiTimeTotal;
+   stTime :> uiTimeTotal;
+   uiTimeTotal = uiTimeTotal + ui1uSec ;  
+   stTime when timerafter(uiTimeTotal) :> void;  
+}
 
-    chan c ;
-    par 
-    {
-        task1 ( c ) ;
-        task2 ( c ) ;
-    }
+/***********************************************************************
+ * Function Name: main 
+ * Arguments	  : void
+ * Return Type	: int
+ * Details	    : main function, start of the code
+ * *********************************************************************/
+inline void Fndelay10us(void)
+{
+   uint64_t uiTimeTotal;
+   stTime :> uiTimeTotal;
+   uiTimeTotal = uiTimeTotal + ui10uSec ;  
+   stTime when timerafter(uiTimeTotal) :> void;  
+}
 
-    return RESET ;
+/***********************************************************************
+ * Function Name: main 
+ * Arguments	  : void
+ * Return Type	: int
+ * Details	    : main function, start of the code
+ * *********************************************************************/
+inline void Fndelay100us(void)
+{
+   uint64_t uiTimeTotal;
+   stTime :> uiTimeTotal;
+   uiTimeTotal = uiTimeTotal + ui100uSec ;  
+   stTime when timerafter(uiTimeTotal) :> void;  
+}
+
+/***********************************************************************
+ * Function Name: main 
+ * Arguments	  : void
+ * Return Type	: int
+ * Details	    : main function, start of the code
+ * *********************************************************************/
+inline void Fndelay1ms(void)
+{
+   uint64_t uiTimeTotal;
+   stTime :> uiTimeTotal;
+   uiTimeTotal = uiTimeTotal + ui1mSec ;  
+   stTime when timerafter(uiTimeTotal) :> void;  
+}
+
+/***********************************************************************
+ * Function Name: main 
+ * Arguments	  : void
+ * Return Type	: int
+ * Details	    : main function, start of the code
+ * *********************************************************************/
+inline void Fndelay10ms(void)
+{
+   uint64_t uiTimeTotal;
+   stTime :> uiTimeTotal;
+   uiTimeTotal = uiTimeTotal + ui10mSec ;  
+   stTime when timerafter(uiTimeTotal) :> void;  
+}
+
+/***********************************************************************
+ * Function Name: main 
+ * Arguments	  : void
+ * Return Type	: int
+ * Details	    : main function, start of the code
+ * *********************************************************************/
+inline void Fndelay100ms(void)
+{
+   uint64_t uiTimeTotal;
+   stTime :> uiTimeTotal;
+   uiTimeTotal = uiTimeTotal + ui100mSec ;  
+   stTime when timerafter(uiTimeTotal) :> void;  
+}
+
+/***********************************************************************
+ * Function Name: main 
+ * Arguments	  : void
+ * Return Type	: int
+ * Details	    : main function, start of the code
+ * *********************************************************************/
+inline void Fndelay1s(void)
+{
+   uint64_t uiTimeTotal;
+   stTime :> uiTimeTotal;
+   uiTimeTotal = uiTimeTotal + ui1Sec ;  
+   stTime when timerafter(uiTimeTotal) :> void;  
 }

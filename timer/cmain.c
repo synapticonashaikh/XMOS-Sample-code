@@ -1,3 +1,4 @@
+
 /**************************************************************************************
  **************************************************************************************
  ______________________________________________________________________________________
@@ -85,53 +86,25 @@
  *                           Includes
  * ----------------------------------------------------------------------------
 */
-     
-	/*Standard Header files*/
-	#include "header.h"
-        
+
+	/**********Standard Header Files*********/		
+  #include "header.h"
 
 /* ----------------------------------------------------------------------------
  *                          GLOBAL VARIABLE DECLARATION
  * ----------------------------------------------------------------------------
 */
 
-
 /* ----------------------------------------------------------------------------
  *                           Fnction Definitions
  * ----------------------------------------------------------------------------
 */
 
-void task1 (chanend c) 
-{
-    UNION8 UN; UN.ui64 = RESET;
-    
-    while (SET)
-    {    
-        c <: UN.ui64;
-        delay_milliseconds(1000); //this function does not work in simulation
-        UN.ui64++;
-    }
-}
-void task2 (chanend c) 
-{
-    while (SET)
-    {
-        select 
-        {
-            case c :> uint64_t UN:
-            printf("int value = %d\n",UN); 
-            break ;
-            default: break; // to make the select non-blockable 
-        }     
-    }
-}
-
-
 /* ----------------------------------------------------------------------------
  *                           important command
  * ----------------------------------------------------------------------------
 */
-	//xcc -target=XCORE-200-EXPLORER file_location/hello.c -o output_location/helloworld.xe
+	//xcc -target=XCORE-200-EXPLORER file_location/timer1sec.xc -o output_location/timer1sec.xe
 	//xsim output_location/helloworld.xe
 	//xrun --io output_location/helloworld.xe
 
@@ -141,15 +114,14 @@ void task2 (chanend c)
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-int main ( ) 
+int main(void)
 {
 
-    chan c ;
-    par 
+    for (int i=0; ; )
     {
-        task1 ( c ) ;
-        task2 ( c ) ;
+        printf("TIME =%d\n\r",i++);
+        Fndelay1s();
     }
 
-    return RESET ;
+    return 0;
 }

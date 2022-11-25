@@ -5,6 +5,7 @@
         "random": "cpp",
         "cheader.h": "c",
         "zdefinitions.h": "c",
-        "string": "cpp"
+        "string": "cpp",
+        "header.h": "c"
     }
 }
