@@ -122,5 +122,10 @@ int main ( )
   	printf ("Hello World \n ") ;
   /*print function from print library*/
     printstrln("Hello World");  
+
+  #ifdef __XC__
+      printf("COMPILER DEFINITION");
+  #endif
+
 	return RESET;
 }
