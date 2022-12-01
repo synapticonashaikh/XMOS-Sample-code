@@ -1,0 +1,158 @@
+
+/**************************************************************************************
+ **************************************************************************************
+ ______________________________________________________________________________________
+
+  Company:
+	Synapticon GmbH (https://www.synapticon.com/)
+ ______________________________________________________________________________________
+
+  File Name:
+	led.xc
+ ______________________________________________________________________________________
+
+  Summary:
+    This file contains the source code for testing all IO ports of XMOS.
+ ______________________________________________________________________________________
+
+  Description:
+	This file contains the source code for a self-practice task by Synapticon GmbH. 
+    It implements the logic of the application's requirements, and it may call API 
+    routines from a different section of the code, such as drivers, system services, 
+    and middleware (if applicable). However, at present, this code is not calling 
+    any of the system-specified APIs (such as the "USARTInitialize" and "TimerTasks"
+    functions) of any of the modules in the system. To make the code development 
+    environment-friendly, the majority of the code shall be using self-created drivers.
+
+ **************************************************************************************
+ **************************************************************************************/
+
+ /**************************************************************************************
+   No-Copyright (c):
+	 No copyrights are being imposed on these software files. Information shall have
+	 to be freely available for the rapid development of science to benefit humanity.
+	 When the information is free, this is not a barrier to their progress. Therefore,
+	 I, Aatif Shaikh, license you the right to use, modify, copy and distribute this
+	 software however you desire.
+
+	 Note*
+	 Software and documentation are provided "as is" without warranty of any kind,
+	 either express or implied, including without limitation, any warranty of
+	 merchantability, title, non-infringement and fitness for a particular purpose.
+	 In no event shall, I (Aatif Shaikh) liable or obligated under contract,
+	 negligence, strict liability, contribution, breach of warranty, or other legal
+	 equitable theory any direct or indirect damages or expenses including but not
+	 limited to any incidental, special, indirect, punitive or consequential damages,
+	 lost profits or lost data, cost of procurement of substitute goods, technology,
+	 services, or any claims by third parties (including but not limited to any
+	 defence thereof), or other similar costs.
+
+  ************************************************************************************/
+
+  /************************************************************************************
+  ______                                            __      __                                     
+ /      \                                          |  \    |  \                                    
+|  $$$$$$\ __    __  _______    ______    ______  _| $$_    \$$  _______   ______   _______        
+| $$___\$$|  \  |  \|       \  |      \  /      \|   $$ \  |  \ /       \ /      \ |       \       
+ \$$    \ | $$  | $$| $$$$$$$\  \$$$$$$\|  $$$$$$\\$$$$$$  | $$|  $$$$$$$|  $$$$$$\| $$$$$$$\      
+ _\$$$$$$\| $$  | $$| $$  | $$ /      $$| $$  | $$ | $$ __ | $$| $$      | $$  | $$| $$  | $$      
+|  \__| $$| $$__/ $$| $$  | $$|  $$$$$$$| $$__/ $$ | $$|  \| $$| $$_____ | $$__/ $$| $$  | $$      
+ \$$    $$ \$$    $$| $$  | $$ \$$    $$| $$    $$  \$$  $$| $$ \$$     \ \$$    $$| $$  | $$      
+  \$$$$$$  _\$$$$$$$ \$$   \$$  \$$$$$$$| $$$$$$$    \$$$$  \$$  \$$$$$$$  \$$$$$$  \$$   \$$      
+          |  \__| $$                    | $$                                                       
+           \$$    $$                    | $$                                                       
+            \$$$$$$                      \$$                                                       
+                          ______                 __        __    __                                
+                         /      \               |  \      |  \  |  \                               
+                        |  $$$$$$\ ______ ____  | $$____  | $$  | $$                               
+                        | $$ __\$$|      \    \ | $$    \ | $$__| $$                               
+                        | $$|    \| $$$$$$\$$$$\| $$$$$$$\| $$    $$                               
+                        | $$ \$$$$| $$ | $$ | $$| $$  | $$| $$$$$$$$                               
+                        | $$__| $$| $$ | $$ | $$| $$__/ $$| $$  | $$                               
+                         \$$    $$| $$ | $$ | $$| $$    $$| $$  | $$                               
+                          \$$$$$$  \$$  \$$  \$$ \$$$$$$$  \$$   \$$                               
+                                                                                                   
+                                                                                                                                                                                                   
+		        In order to be irreplaceable, one must always be different
+  *************************************************************************************/
+
+/* ----------------------------------------------------------------------------
+ *                           MACROS
+ * ----------------------------------------------------------------------------
+*/
+
+
+/* ----------------------------------------------------------------------------
+ *                           Includes
+ * ----------------------------------------------------------------------------
+*/
+
+	/*Standard Header files*/
+	#include "header.h"
+        
+
+/* ----------------------------------------------------------------------------
+ *                          GLOBAL VARIABLE DECLARATION
+ * ----------------------------------------------------------------------------
+*/
+
+/* ----------------------------------------------------------------------------
+ *                           Fnction Definitions
+ * ----------------------------------------------------------------------------
+*/
+
+/* ----------------------------------------------------------------------------
+ *                           important command
+ * ----------------------------------------------------------------------------
+*/
+
+	//xcc -target=XCORE-200-EXPLORER file_location/led.xc -o output_location/ledtoggle.xe
+	//xsim output_location/ledtoggle.xe
+	//xrun --io output_location/ledtoggle.xe 
+  
+
+/***********************************************************************
+ * Function Name: main 
+ * Arguments	  : void
+ * Return Type	: int
+ * Details	    : main function, start of the code
+ * *********************************************************************/
+int main ( )
+{
+
+    printf("PORT1A = %x\n\r",PORT1A);
+    printf("PORT1B = %x\n\r",PORT1B);
+    printf("PORT1C = %x\n\r",PORT1C);
+    printf("PORT1D = %x\n\r",PORT1D);
+    printf("PORT1E = %x\n\r",PORT1E);
+    printf("PORT1F = %x\n\r",PORT1F);
+    printf("PORT1G = %x\n\r",PORT1G);
+    printf("PORT1H = %x\n\r",PORT1H);
+    printf("PORT1I = %x\n\r",PORT1I);
+    printf("PORT1J = %x\n\r",PORT1J);
+    printf("PORT1K = %x\n\r",PORT1K);
+    printf("PORT1L = %x\n\r",PORT1L);
+    printf("PORT1M = %x\n\r",PORT1M);
+    printf("PORT1N = %x\n\r",PORT1N);
+    printf("PORT1O = %x\n\r",PORT1O);
+    printf("PORT1P = %x\n\r",PORT1P);    
+
+    printf("PORT4A = %x\n\r",PORT4A);
+    printf("PORT4B = %x\n\r",PORT4B);
+    printf("PORT4C = %x\n\r",PORT4C);
+    printf("PORT4D = %x\n\r",PORT4D);
+    printf("PORT4E = %x\n\r",PORT4E);
+    printf("PORT4F = %x\n\r",PORT4F);    
+
+    printf("PORT8A = %x\n\r",PORT8A);
+    printf("PORT8B = %x\n\r",PORT8B);
+    printf("PORT8C = %x\n\r",PORT8C);
+    printf("PORT8D = %x\n\r",PORT8D);
+
+    printf("PORT16A = %x\n\r",PORT16A);
+    printf("PORT16B = %x\n\r",PORT16B);
+
+    printf("PORT32A = %x\n\r",PORT32A);
+
+return RESET;
+}
