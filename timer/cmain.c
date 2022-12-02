@@ -116,11 +116,15 @@
  * *********************************************************************/
 int main(void)
 {
+  int delay= 1000;
 
-    for (int i=0; ; )
+    for (; ; )
     {
-        printf("TIME =%d\n\r",i++);
-        Fndelay1s();
+        //printf("T=%d\n\r",i++);        
+        FndelaymSec(delay);
+        FnPortWrite(PORT4A,0x0E);
+        FndelaymSec(delay);
+        FnPortWrite(PORT4A,0x0F);               
     }
 
     return 0;

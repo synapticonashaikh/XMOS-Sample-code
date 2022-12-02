@@ -96,6 +96,46 @@
  * ----------------------------------------------------------------------------
 */
 
+    int count = RESET;
+    int e,temp;
+    port _Port1A  = PORT1A  ;
+    port _Port1B  = PORT1B  ;
+    port _Port1C  = PORT1C  ;
+    port _Port1D  = PORT1D  ;
+    port _Port1E  = PORT1E  ;
+    port _Port1F  = PORT1F  ;
+    port _Port1G  = PORT1G  ;
+    port _Port1H  = PORT1H  ;
+    port _Port1I  = PORT1I  ;
+    port _Port1J  = PORT1J  ;
+    port _Port1K  = PORT1K  ;
+    port _Port1L  = PORT1L  ;
+    port _Port1M  = PORT1M  ;
+    port _Port1N  = PORT1N  ;
+    port _Port1O  = PORT1O  ;
+    port _Port1P  = PORT1P  ;
+
+	/*IO ports-4BITS*/
+    port _Port4A  = PORT4A  ;
+    port _Port4B  = PORT4B  ;
+    port _Port4C  = PORT4C  ;
+    port _Port4D  = PORT4D  ;
+    port _Port4E  = PORT4E  ;
+    port _Port4F  = PORT4F  ;
+
+	/*IO ports-8BITS*/
+    port _Port8A  =  PORT8A  ;
+    port _Port8B  =  PORT8B  ;
+    port _Port8C  =  PORT8C  ;
+    port _Port8D  =  PORT8D  ;
+
+	/*IO ports-16BITS*/
+    port _Port16A = PORT16A  ;
+    port _Port16B = PORT16B  ;
+
+	/*IO ports-32BITS*/
+    port _Port32A = PORT32A  ;
+
 /* ----------------------------------------------------------------------------
  *                           Fnction Definitions
  * ----------------------------------------------------------------------------
@@ -113,12 +153,14 @@
 
 /***********************************************************************
  * Function Name: main 
- * Arguments	  : void
+ * Arguments	: void
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
 int main ( )
 {
+
+
 
     printf("PORT1A = %x\n\r",PORT1A);
     printf("PORT1B = %x\n\r",PORT1B);
@@ -153,6 +195,23 @@ int main ( )
     printf("PORT16B = %x\n\r",PORT16B);
 
     printf("PORT32A = %x\n\r",PORT32A);
+
+
+    while (SET)
+    {
+         count++;
+        _Port4A <: (uint8_t)0x0F;  
+        //led_ports @ e :> temp;
+        printf("[%x][%x]LED OFF--[%d]!\n\r",e,temp,count);        
+        delay_milliseconds(1000) ; //this function does not work in simulation
+       
+
+        _Port4A <: (uint8_t)0x0E; 
+        //led_ports @ e :> temp;                
+        printf("[%x][%x]LED ON --[%d]!\n\r",e,temp ,count);
+        delay_milliseconds(1000) ; //this function does not work in simulation
+        
+    }
 
 return RESET;
 }

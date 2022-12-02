@@ -282,7 +282,11 @@
     void Fndelay10ms (void);
     void Fndelay100ms(void);
     void Fndelay1s   (void); 
+	void FndelayuSec (uint32_t uiTime);
+	void FndelaymSec (uint32_t uiTime);
+	void FndelaySec	 (uint32_t uiTime);
 
-
-
+	int32_t FnPortWrite(uint32_t uiport,uint32_t state);
+	int32_t FnPortRead (uint32_t uiport);
+	
 #endif /*__HEADER_H_*/
