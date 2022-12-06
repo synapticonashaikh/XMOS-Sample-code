@@ -6,6 +6,15 @@
         "cheader.h": "c",
         "zdefinitions.h": "c",
         "string": "cpp",
-        "header.h": "c"
+        "header.h": "c",
+        "optional": "cpp",
+        "system_error": "cpp",
+        "array": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp"
     }
 }
