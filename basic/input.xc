@@ -8,11 +8,11 @@
  ______________________________________________________________________________________
 
   File Name:
-	hello.xc
+	led.xc
  ______________________________________________________________________________________
 
   Summary:
-    This file contains the source code for printing "Hello world" on the terminal.
+    This file contains the source code for testing all IO ports of XMOS.
  ______________________________________________________________________________________
 
   Description:
@@ -96,19 +96,60 @@
  * ----------------------------------------------------------------------------
 */
 
+    int count = RESET;
+    int e,temp;
+    port _Port1A  = PORT1A  ;
+    port _Port1B  = PORT1B  ;
+    port _Port1C  = PORT1C  ;
+    port _Port1D  = PORT1D  ;
+    port _Port1E  = PORT1E  ;
+    port _Port1F  = PORT1F  ;
+    port _Port1G  = PORT1G  ;
+    port _Port1H  = PORT1H  ;
+    in port _Port1I  = PORT1I  ;
+    port _Port1J  = PORT1J  ;
+    port _Port1K  = PORT1K  ;
+    port _Port1L  = PORT1L  ;
+    port _Port1M  = PORT1M  ;
+    port _Port1N  = PORT1N  ;
+    port _Port1O  = PORT1O  ;
+    port _Port1P  = PORT1P  ;
+
+	/*IO ports-4BITS*/
+    port _Port4A  = PORT4A  ;
+    port _Port4B  = PORT4B  ;
+    port _Port4C  = PORT4C  ;
+    port _Port4D  = PORT4D  ;
+    port _Port4E  = PORT4E  ;
+    port _Port4F  = PORT4F  ;
+
+	/*IO ports-8BITS*/
+    port _Port8A  =  PORT8A  ;
+    port _Port8B  =  PORT8B  ;
+    port _Port8C  =  PORT8C  ;
+    port _Port8D  =  PORT8D  ;
+
+	/*IO ports-16BITS*/
+    port _Port16A = PORT16A  ;
+    port _Port16B = PORT16B  ;
+
+	/*IO ports-32BITS*/
+    port _Port32A = PORT32A  ;
+
 /* ----------------------------------------------------------------------------
  *                           Fnction Definitions
  * ----------------------------------------------------------------------------
 */
 
-
 /* ----------------------------------------------------------------------------
  *                           important command
  * ----------------------------------------------------------------------------
 */
-	//xcc -target=XCORE-200-EXPLORER file_location/timer1sec.xc -o output_location/timer1sec.xe
-	//xsim output_location/helloworld.xe
-	//xrun --io output_location/helloworld.xe
+
+	//xcc -target=XCORE-200-EXPLORER file_location/led.xc -o output_location/ledtoggle.xe
+	//xsim output_location/ledtoggle.xe
+	//xrun --io output_location/ledtoggle.xe 
+  
 
 /***********************************************************************
  * Function Name: main 
@@ -116,26 +157,17 @@
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-int main( )
+int main ( )
 {
 
-    /*set the timer for 100ns */
-    timer    stTime;
-    uint64_t uiTimeTotal;
-    uint32_t uiCount=0; 
-
-    stTime :> uiTimeTotal;
-    uiTimeTotal = uiTimeTotal + ui1Sec ;   
-    printf("Current Time Count =%u\n",stTime);
-    printf("Total Time Count=%u\n", uiTimeTotal);
-
-    while(SET)
-    {    
-        stTime when timerafter(uiTimeTotal) :> void;    
-        uiTimeTotal = uiTimeTotal + ui1Sec ;   
-        uiCount++;
-        printf("S=%u\n\r",uiCount);                          
+    while (SET)
+    {
+         count++;
+        _Port1I @ e :> temp;
+        printf("[%d]P1L = [%d][%d]\n\r",count,e,temp);        
+        delay_milliseconds(100) ; //this function does not work in simulation       
+        
     }
-    
-return 0;
+
+return RESET;
 }

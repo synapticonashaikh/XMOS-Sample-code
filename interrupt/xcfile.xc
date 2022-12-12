@@ -1,4 +1,3 @@
-
 /**************************************************************************************
  **************************************************************************************
  ______________________________________________________________________________________
@@ -8,7 +7,7 @@
  ______________________________________________________________________________________
 
   File Name:
-	hello.xc
+	parallel.xc
  ______________________________________________________________________________________
 
   Summary:
@@ -77,65 +76,112 @@
   *************************************************************************************/
 
 /* ----------------------------------------------------------------------------
- *                           MACROS
+ *                           Macros
  * ----------------------------------------------------------------------------
 */
-
-
 /* ----------------------------------------------------------------------------
  *                           Includes
  * ----------------------------------------------------------------------------
 */
-
 	/*Standard Header files*/
-	#include "header.h"
-        
-
+		#include "header.h"	
 /* ----------------------------------------------------------------------------
- *                          GLOBAL VARIABLE DECLARATION
+ *                           External Function
+ * ----------------------------------------------------------------------------
+*/  
+  extern "C" {  void GPIOInterrupt(void); void GPIOINTRWrapper(void); }        
+/* ----------------------------------------------------------------------------
+ *                           GLOBAL VARIABLE DECLARATION
  * ----------------------------------------------------------------------------
 */
-
+    timer stTime1,stTime2;    
+    int CallbackCount = 0;
 /* ----------------------------------------------------------------------------
  *                           Fnction Definitions
  * ----------------------------------------------------------------------------
 */
+/***********************************************************************
+ * Function Name: Function1 
+ * Arguments	  : void
+ * Return Type	: void
+ * Details	    : Just a callback function
+ * *********************************************************************/
+void CallbackFunction(void)
+{
+    CallbackCount++;
+  	printf ("CALLBACK FUNCTION=%d\n\r",CallbackCount);
+}
+/***********************************************************************
+ * Function Name: Function1 
+ * Arguments	  : void
+ * Return Type	: void
+ * Details	    : Just a callback function
+ * *********************************************************************/
+void WhileOneLoop(void)
+{
+  uint64_t uiTimeTotal;
+  uint32_t uiCount=0; 
+  stTime1 :> uiTimeTotal;
+  uiTimeTotal = uiTimeTotal + ui1Sec ;   
+  while (SET)
+  {
+      stTime1 when timerafter(uiTimeTotal) :> void;    
+      uiTimeTotal = uiTimeTotal + ui1Sec ;   
+      uiCount++;
+      printf("1S=%u\n\r",uiCount);    
+  }    
+}
 
+/***********************************************************************
+ * Function Name: Function1 
+ * Arguments	  : void
+ * Return Type	: void
+ * Details	    : Just a callback function
+ * *********************************************************************/
+void WhileTwoLoop(void)
+{
+  uint64_t uiTimeTotal;
+  uint32_t uiCount=0; 
+  stTime2 :> uiTimeTotal;
+  uiTimeTotal = uiTimeTotal + ui1Sec ;   
+  while (SET)
+  {
+      stTime2 when timerafter(uiTimeTotal) :> void;    
+      uiTimeTotal = uiTimeTotal + ui1Sec ;   
+      uiCount++;
+      printf("2S=%u\n\r",uiCount);    
+  }    
+}
 
-/* ----------------------------------------------------------------------------
- *                           important command
- * ----------------------------------------------------------------------------
-*/
-	//xcc -target=XCORE-200-EXPLORER file_location/timer1sec.xc -o output_location/timer1sec.xe
-	//xsim output_location/helloworld.xe
-	//xrun --io output_location/helloworld.xe
+/***********************************************************************
+ * Function Name: Function1 
+ * Arguments	  : void
+ * Return Type	: void
+ * Details	    : Just a callback function
+ * *********************************************************************/
+void FnParallel(void)
+{
+  printf("Para start\n");
+  par
+    {
+      WhileOneLoop( );
+      WhileTwoLoop( );
+    }
+}
 
 /***********************************************************************
  * Function Name: main 
- * Arguments	: void
+ * Arguments	  : void
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-int main( )
+int main ( )
 {
-
-    /*set the timer for 100ns */
-    timer    stTime;
-    uint64_t uiTimeTotal;
-    uint32_t uiCount=0; 
-
-    stTime :> uiTimeTotal;
-    uiTimeTotal = uiTimeTotal + ui1Sec ;   
-    printf("Current Time Count =%u\n",stTime);
-    printf("Total Time Count=%u\n", uiTimeTotal);
-
-    while(SET)
-    {    
-        stTime when timerafter(uiTimeTotal) :> void;    
-        uiTimeTotal = uiTimeTotal + ui1Sec ;   
-        uiCount++;
-        printf("S=%u\n\r",uiCount);                          
-    }
-    
-return 0;
+  printf("start of the code!\n\r");
+  GPIOInterrupt( );
+  GPIOINTRWrapper( );
+ /*control should not reach here*/   
+ return RESET;   
 }
+
+  
