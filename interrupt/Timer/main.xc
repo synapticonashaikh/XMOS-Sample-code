@@ -1,4 +1,3 @@
-
 /**************************************************************************************
  **************************************************************************************
  ______________________________________________________________________________________
@@ -8,7 +7,7 @@
  ______________________________________________________________________________________
 
   File Name:
-	hello.xc
+	parallel.xc
  ______________________________________________________________________________________
 
   Summary:
@@ -77,36 +76,53 @@
   *************************************************************************************/
 
 /* ----------------------------------------------------------------------------
- *                           MACROS
+ *                           Macros
  * ----------------------------------------------------------------------------
 */
-
-
 /* ----------------------------------------------------------------------------
  *                           Includes
  * ----------------------------------------------------------------------------
 */
-
-	/**********Standard Header Files*********/		
-  #include "header.h"
-
-/* ----------------------------------------------------------------------------
- *                          GLOBAL VARIABLE DECLARATION
- * ----------------------------------------------------------------------------
-*/
+	/*Standard Header files*/
+	#include "header.h"	
+    #include <hwtimer.h> 
 
 /* ----------------------------------------------------------------------------
- *                           Fnction Definitions
+ *                           External Function
  * ----------------------------------------------------------------------------
-*/
+*/  
+    extern void FnTimerInterruptInit (hwtimer_t Var); 
+    extern void FnTimerInterruptStart(hwtimer_t Var);    
+    extern void FnTimerInterruptStop (hwtimer_t Var);  
 
 /* ----------------------------------------------------------------------------
- *                           important command
+ *                           Global Variable
  * ----------------------------------------------------------------------------
-*/
-	//xcc -target=XCORE-200-EXPLORER file_location/timer1sec.xc -o output_location/timer1sec.xe
-	//xsim output_location/helloworld.xe
-	//xrun --io output_location/helloworld.xe
+*/ 
+    hwtimer_t varTimerInterrupt;
+/* ----------------------------------------------------------------------------
+ *                           Function Definition
+ * ----------------------------------------------------------------------------
+*/ 
+/***********************************************************************
+ * Function Name: main 
+ * Arguments	: void
+ * Return Type	: int
+ * Details	    : main function, start of the code
+ * *********************************************************************/
+void FnTimerInterruptHandler(void)
+{
+    FnTimerInterruptStart(varTimerInterrupt);
+    printstr("Inside timer isr ...\n");
+}                             
+/***********************************************************************
+ * Function Name: main 
+ * Arguments	: void
+ * Return Type	: int
+ * Details	    : main function, start of the code
+ * *********************************************************************/
+unsigned FnTimerInterruptGetTime(hwtimer_t Var)
+{ unsigned time; Var :> time; return time; }                                                           
 
 /***********************************************************************
  * Function Name: main 
@@ -114,18 +130,39 @@
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-int main(void)
+void FnInfiniteLoop(void)
 {
-  int delay= 1000;
+    timer    stTime;
+    uint64_t uiTimeTotal;
+    uint32_t uiCount=0; 
 
-    for (; ; )
-    {
-        //printf("T=%d\n\r",i++);        
-        FndelaymSec(delay);
-        FnPortWrite(PORT4A,0x0E);
-        FndelaymSec(delay);
-        FnPortWrite(PORT4A,0x0F);               
+    stTime :> uiTimeTotal;
+    uiTimeTotal = uiTimeTotal + ui1Sec ;   
+    while(SET)
+    {    
+        stTime when timerafter(uiTimeTotal) :> void;    
+        uiTimeTotal = uiTimeTotal + ui1Sec ;   
+        uiCount++;
+        printf("S=%u\n\r",uiCount); 
+        if (uiCount == 10 ) 
+            FnTimerInterruptStop(varTimerInterrupt);                         
     }
+}
 
-    return 0;
+/* ----------------------------------------------------------------------------
+ *                           Start of the code
+ * ----------------------------------------------------------------------------
+*/ 
+/***********************************************************************
+ * Function Name: main 
+ * Arguments	: void
+ * Return Type	: int
+ * Details	    : main function, start of the code
+ * *********************************************************************/
+int main( )
+{
+    FnTimerInterruptInit(varTimerInterrupt);
+    
+    FnInfiniteLoop( );
+    return RESET;
 }

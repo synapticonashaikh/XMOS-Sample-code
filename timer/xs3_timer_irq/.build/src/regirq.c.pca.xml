@@ -1,5 +1,0 @@
-<preCompilationAnalysis file="../src/regirq.c">
-  <fCall global="true" name="__timer_handler_kernel_stack_end"/>
-  <fCall global="true" name="__timer_handler_handler"/>
-  <fCall global="true" name="timer_handler"/>
-</preCompilationAnalysis>

@@ -7,11 +7,12 @@
  ______________________________________________________________________________________
 
   File Name:
-	parallel.xc
+	header.h
  ______________________________________________________________________________________
 
   Summary:
-    This file contains the source code for printing "Hello world" on the terminal.
+    This file contains all the definitions, includes, and extensions required 
+    to run other source code.
  ______________________________________________________________________________________
 
   Description:
@@ -76,84 +77,214 @@
   *************************************************************************************/
 
 /* ----------------------------------------------------------------------------
- *                           Macros
+ *                           MACROS
  * ----------------------------------------------------------------------------
 */
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __HEADER_H_
+#define __HEADER_H_
+
+	/*Basic definition*/
+	#define   SET		1
+	#define RESET		0
+	#define TRUE		SET
+	#define FALSE		RESET	
+	#define  ERROR 	   (int8_t)-1	
+
+	/*IO ports-1BIT*/
+    #define PORT1A  XS1_PORT_1A
+    #define PORT1B  XS1_PORT_1B
+    #define PORT1C  XS1_PORT_1C
+    #define PORT1D  XS1_PORT_1D
+    #define PORT1E  XS1_PORT_1E
+    #define PORT1F  XS1_PORT_1F
+    #define PORT1G  XS1_PORT_1G
+    #define PORT1H  XS1_PORT_1H
+    #define PORT1I  XS1_PORT_1I
+    #define PORT1J  XS1_PORT_1J
+    #define PORT1K  XS1_PORT_1K
+    #define PORT1L  XS1_PORT_1L
+    #define PORT1M  XS1_PORT_1M
+    #define PORT1N  XS1_PORT_1N
+    #define PORT1O  XS1_PORT_1O
+    #define PORT1P  XS1_PORT_1P
+
+	/*IO ports-4BITS*/
+    #define PORT4A  XS1_PORT_4A
+    #define PORT4B  XS1_PORT_4B
+    #define PORT4C  XS1_PORT_4C
+    #define PORT4D  XS1_PORT_4D
+    #define PORT4E  XS1_PORT_4E
+    #define PORT4F  XS1_PORT_4F
+
+	/*IO ports-8BITS*/
+    #define PORT8A  XS1_PORT_8A
+    #define PORT8B  XS1_PORT_8B
+    #define PORT8C  XS1_PORT_8C
+    #define PORT8D  XS1_PORT_8D
+
+	/*IO ports-16BITS*/
+    #define PORT16A  XS1_PORT_16A
+    #define PORT16B  XS1_PORT_16B
+
+	/*IO ports-32BITS*/
+    #define PORT32A  XS1_PORT_32A	
+
+	/*tile nuumber*/
+	#define TILE0		(uint8_t)0
+	#define TILE1		(uint8_t)1
+
+	/*core number*/
+	#define CORE0		(uint8_t)0
+	#define CORE1		(uint8_t)1
+	#define CORE2		(uint8_t)2	
+	#define CORE3		(uint8_t)3
+	#define CORE4		(uint8_t)4
+	#define CORE5		(uint8_t)5
+	#define CORE6		(uint8_t)6	
+	#define CORE7		(uint8_t)7
+
+    /*Timer constant*/
+    //as the system is working on 100Mhz, the unit time of a cycle is 10ns
+    #define    uiUnitTimeMul (uint8_t)10
+    #define    ui10nSec      (uint8_t)1 
+    #define    ui100nSec     (uint8_t)(ui10nSec   * uiUnitTimeMul)
+
+    #define    ui1uSec       (uint16_t)(ui100nSec * uiUnitTimeMul)
+    #define    ui10uSec      (uint16_t)(ui1uSec   * uiUnitTimeMul)
+    #define    ui100uSec     (uint32_t)(ui10uSec  * uiUnitTimeMul)
+
+    #define    ui1mSec       (uint32_t)(ui100uSec * uiUnitTimeMul)
+    #define    ui10mSec      (uint32_t)(ui1mSec   * uiUnitTimeMul)
+    #define    ui100mSec     (uint32_t)(ui10mSec  * uiUnitTimeMul)
+    #define    ui1Sec        (uint32_t)(ui100mSec * uiUnitTimeMul)
+
+
 /* ----------------------------------------------------------------------------
  *                           Includes
  * ----------------------------------------------------------------------------
 */
-  #include <stdio.h>
-  #include <xcore/hwtimer.h>
-  #include <xcore/triggerable.h>
-  #include <xcore/port.h>
-  #include <xcore/interrupt.h>
-  #include <xcore/interrupt_wrappers.h>
-/* ----------------------------------------------------------------------------
- *                           External Function
- * ----------------------------------------------------------------------------
-*/ 
-  extern void CallbackFunction(void);
-  extern void FnParallel(void);
-/* ----------------------------------------------------------------------------
- *                           GLOBAL VARIABLE DECLARATION
- * ----------------------------------------------------------------------------
-*/
-  port_t button1 = XS1_PORT_1P;
-  static uint8_t RisingFallingEdge; //current code generates on rising edge!
-  static uint8_t uifeedback,uiStatus;
-/* ----------------------------------------------------------------------------
- *                           Fnction Definitions
- * ----------------------------------------------------------------------------
-*/
-/***********************************************************************
- * Function Name: main 
- * Arguments	  : void
- * Return Type	: int
- * Details	    : main function, start of the code
- * *********************************************************************/
-DEFINE_INTERRUPT_PERMITTED(interrupt_handlers, void, interruptable_task, void)
-{
-  interrupt_unmask_all( ); 
-  FnParallel( );
-}
-/***********************************************************************
- * Function Name: main 
- * Arguments	  : void
- * Return Type	: int
- * Details	    : main function, start of the code
- * *********************************************************************/
-DEFINE_INTERRUPT_CALLBACK (interrupt_handlers, interrupt_task, button)
-{
-  //manipulation to get the interrupt on rsising edge only
-  port_set_trigger_in_not_equal(button1, RisingFallingEdge);
-  RisingFallingEdge = !RisingFallingEdge;
-  uifeedback = port_peek(button1); 
-  if      (( uifeedback == 1 ) && (uiStatus == 0))
-          { CallbackFunction( ); uiStatus = 1;}
-  else if ((uifeedback == 0 ) && (uiStatus == 1)) 
-          { uiStatus = 0;   }
-}
 
-/***********************************************************************
- * Function Name: main 
- * Arguments	  : void
- * Return Type	: int
- * Details	    : main function, start of the code
- * *********************************************************************/
-void GPIOINTRWrapper(void)
-{ INTERRUPT_PERMITTED(interruptable_task)( ); }
-/***********************************************************************
- * Function Name: main 
- * Arguments	  : void
- * Return Type	: int
- * Details	    : main function, start of the code
- * *********************************************************************/
-void GPIOInterrupt(void)
-{
-  port_enable(button1);
-  triggerable_setup_interrupt_callback(button1, &button1, INTERRUPT_CALLBACK(interrupt_task));
-  port_set_trigger_in_not_equal(button1, 1);
-  port_clear_trigger_in(button1);
-  triggerable_enable_trigger(button1);
-}
+	/**********Standard Header Files*********/		
+		//#include <iostream> 
+		#include <stdio.h>
+		#include <stdlib.h>
+		#include <unistd.h>
+		#include <stdint.h>             
+		#include <limits.h>	
+		#include <string.h>	
+		#include <signal.h>
+		#include <math.h>
+		#include <time.h>
+		#include <errno.h>           			
+
+
+        /*XMOS related hedaer*/
+#ifdef __XC__ 		
+        #include <platform.h>
+        #include <xs1.h>
+        #include <timer.h>
+        #include <flash.h>
+		#include <print.h>							  
+#endif
+
+/* ----------------------------------------------------------------------------
+ *                           STRUCTURE VARIABLES
+ * ----------------------------------------------------------------------------
+*/
+	/*********union conversion 8 byte **********/
+	typedef union
+	{
+		uint8_t 	ui8[(uint8_t)8] ; int8_t   si8[(uint8_t)8];
+		uint16_t	ui16[(uint8_t)4]; int16_t si16[(uint8_t)4];
+		uint32_t	ui32[(uint8_t)2]; int32_t si32[(uint8_t)2];
+		uint64_t	ui64; int64_t si64;
+		float		fl32[(uint8_t)2]; double dd64;
+
+	}UNION8;
+
+	/*********union conversion 4 byte **********/
+	typedef union
+	{
+		uint8_t 	ui8[(uint8_t)4];  int8_t	si8[(uint8_t)4];
+		uint16_t	ui16[(uint8_t)2]; int16_t	si16[(uint8_t)2];
+		uint32_t	ui32; int32_t si32;
+		float		fl32;
+
+	}UNION4;
+
+	/*********union conversion 2 byte **********/
+	typedef union
+	{
+		uint8_t 	ui8[(uint8_t)2]; int8_t	si8[(uint8_t)2];
+		uint16_t	ui16; int16_t	si16;
+
+	}UNION2;
+
+
+	/*********Timer flag **********/
+	typedef struct 
+	{
+		uint8_t  uiTime1mSecFlag   ;
+		uint8_t  uiTime10mSecFlag  ;		
+		uint8_t  uiTime100mSecFlag ;    
+		uint8_t  uiTime1SecFlag  ;
+		uint8_t  uiTime1MinFlag  ;
+		uint8_t  uiTime1HourFlag ;		
+		
+	}TIMERF;
+
+
+	/*********Timer structure **********/
+	typedef struct 
+	{
+
+		//timer    stTime;
+		uint64_t uiCompareTime;
+		TIMERF	 TimerFlag;
+
+		uint8_t  uiTime1uSec ;     
+		uint8_t  uiTime10uSec ;     
+		uint8_t  uiTime100uSec ;     
+
+		uint8_t  uiTime1mSec   ;
+		uint8_t  uiTime10mSec  ;		
+		uint8_t  uiTime100mSec ;    
+		uint8_t  uiTime1Sec  ;
+		uint8_t  uiTime1Min  ;
+		uint8_t  uiTime1Hour ;
+
+	}TIMER0;
+
+/* ----------------------------------------------------------------------------
+ *                           CLASS VARIABLES
+ * ----------------------------------------------------------------------------
+*/
+    /**********************xxxx Class***************************/
+
+
+/* ----------------------------------------------------------------------------
+ *                          GLOBAL VARIABLE DECLARATION
+ * ----------------------------------------------------------------------------
+*/
+
+/* ---------------------------------------------------------------------------
+*                           FUNCTIONS DECLARATION
+* ----------------------------------------------------------------------------
+*/
+
+	void Fndelay1us	(void);
+	void Fndelay10us (void);
+	void Fndelay100us(void);	
+    void Fndelay1ms  (void);
+    void Fndelay10ms (void);
+    void Fndelay100ms(void);
+    void Fndelay1s   (void); 
+	void FndelayuSec (uint32_t uiTime);
+	void FndelaymSec (uint32_t uiTime);
+	void FndelaySec	 (uint32_t uiTime);
+
+	int32_t FnPortWrite(uint32_t uiport,uint32_t state);
+	int32_t FnPortRead (uint32_t uiport);
+	
+#endif /*__HEADER_H_*/
