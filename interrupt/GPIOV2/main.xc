@@ -11,7 +11,7 @@
  ______________________________________________________________________________________
 
   Summary:
-    This file contains the source code for printing "Hello world" on the terminal.
+    This file contains the source code to get the gpio interrupt.
  ______________________________________________________________________________________
 
   Description:
@@ -73,80 +73,113 @@
                                                                                                    
                                                                                                                                                                                                    
 		        In order to be irreplaceable, one must always be different
-  *************************************************************************************/ 
-/* ----------------------------------------------------------------------------
- *                           Includes
- * ----------------------------------------------------------------------------
-*/
-    #include "header.h"	
-    #include "interrupt.h"    
-    #include <hwtimer.h>  
-    #include <xs1.h>
+  *************************************************************************************/
 
 /* ----------------------------------------------------------------------------
  *                           Macros
  * ----------------------------------------------------------------------------
 */
-    register_interrupt_handler(FnTimerInterruptHandler, 1, 200)    
+/* ----------------------------------------------------------------------------
+ *                           Includes
+ * ----------------------------------------------------------------------------
+*/
+	/*Standard Header files*/
+	#include "header.h"	
+    #include <hwtimer.h>    
 
 /* ----------------------------------------------------------------------------
  *                           External Function
  * ----------------------------------------------------------------------------
 */  
-    void FnTimerInterruptHandler(void);
-    unsigned FnTimerInterruptGetTime(hwtimer_t Var);
+    extern void FnGPIOInterruptInit (port Var); 
+    extern void FnGPIOInterruptStart(port Var,uint8_t status);    
+    extern void FnGPIOInterruptStop (port Var);  
+    extern void FnGPIOInterruptManage(port Var);
+
 /* ----------------------------------------------------------------------------
  *                           Global Variable
  * ----------------------------------------------------------------------------
 */ 
+    port varGPIOInterrupt = XS1_PORT_1P;
+    uint8_t TimerInterruptFlag = RESET;
 /* ----------------------------------------------------------------------------
  *                           Function Definition
  * ----------------------------------------------------------------------------
-*/
+*/ 
 /***********************************************************************
- * Function Name: main 
+ * Function Name: FnGPIOInterruptHandler 
  * Arguments	: void
- * Return Type	: int
- * Details	    : main function, start of the code
+ * Return Type	: void
+ * Details	    : 
  * *********************************************************************/
-void FnTimerInterruptUpdate(hwtimer_t Var)
+void FnGPIOInterruptHandler(void)
 {
-    unsigned time;
-    DISABLE_INTERRUPTS( );
-    asm volatile("setc res[%0], %1"::"r"(Var),"r"(XS1_SETC_COND_NONE));
-    time = FnTimerInterruptGetTime(Var);
-    time += ui1Sec;
-    asm volatile("setd res[%0], %1"::"r"(Var),"r"(time));
-    asm volatile("setc res[%0], %1"::"r"(Var),"r"(XS1_SETC_COND_AFTER));
-}    
+    /*inside the callback it is important to have manage function
+      So that it can manipulate the interrupt to rising/ falling edge only*/  
+    //FnGPIOInterruptManage(varGPIOInterrupt);  
+   TimerInterruptFlag = SET;
+   printstr("");
+}   
 /***********************************************************************
- * Function Name: main 
+ * Function Name: FnGPIOInterruptHandler 
  * Arguments	: void
- * Return Type	: int
- * Details	    : main function, start of the code
+ * Return Type	: void
+ * Details	    : 
  * *********************************************************************/
-void FnTimerInterruptStop(hwtimer_t Var)
+void FnTimerProcess(void)
 {
-    DISABLE_INTERRUPTS( );
-    asm volatile("setc res[%0], %1"::"r"(Var),"r"(XS1_SETC_COND_NONE));
+
+        if ( TimerInterruptFlag == SET )
+        {    TimerInterruptFlag = RESET;
+             printf("Timer Process!\n\r");
+             //FnGPIOInterruptStop(varGPIOInterrupt);
+
+        }
 }
+
+
+
+
 /***********************************************************************
  * Function Name: main 
  * Arguments	: void
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-void FnTimerInterruptInit(hwtimer_t Var)
+void FnInfiniteLoop(void)
 {
-    set_interrupt_handler(FnTimerInterruptHandler, 1, Var, 0);
+    timer    stTime;
+    uint64_t uiTimeTotal; uint32_t uiCount=0; 
+    
+    stTime :> uiTimeTotal;
+    uiTimeTotal = uiTimeTotal + ui1Sec ;   
+    while(SET)
+    {    
+        stTime when timerafter(uiTimeTotal):> void;    
+        uiTimeTotal = uiTimeTotal + ui1mSec ; uiCount++;
+        //printf("S=%u\n\r",uiCount);                   
+
+        FnTimerProcess( );
+    }
 }
+
+
+
+/* ----------------------------------------------------------------------------
+ *                           Start of the code
+ * ----------------------------------------------------------------------------
+*/ 
 /***********************************************************************
  * Function Name: main 
  * Arguments	: void
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-void FnTimerInterruptStart(hwtimer_t Var)
+int main( )
 {
-    FnTimerInterruptUpdate(Var);
+    /*start should come before init (to update the time)*/   
+    FnGPIOInterruptStart(varGPIOInterrupt,irqGPIO_RISING_EDGE);    
+    FnGPIOInterruptInit (varGPIOInterrupt);     
+    FnInfiniteLoop( );
+    return RESET;
 }

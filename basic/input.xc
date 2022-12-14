@@ -106,7 +106,7 @@
     port _Port1F  = PORT1F  ;
     port _Port1G  = PORT1G  ;
     port _Port1H  = PORT1H  ;
-    in port _Port1I  = PORT1I  ;
+    port _Port1I  = PORT1I  ;
     port _Port1J  = PORT1J  ;
     port _Port1K  = PORT1K  ;
     port _Port1L  = PORT1L  ;
@@ -163,7 +163,7 @@ int main ( )
     while (SET)
     {
          count++;
-        _Port1I @ e :> temp;
+        _Port1P @ e :> temp;
         printf("[%d]P1L = [%d][%d]\n\r",count,e,temp);        
         delay_milliseconds(100) ; //this function does not work in simulation       
         

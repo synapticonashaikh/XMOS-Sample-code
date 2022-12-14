@@ -82,23 +82,27 @@
     #include "interrupt.h"    
     #include <hwtimer.h>  
     #include <xs1.h>
-
+    #include <xcore/port.h>
+    #include <print.h>	
 /* ----------------------------------------------------------------------------
  *                           Macros
  * ----------------------------------------------------------------------------
 */
-    register_interrupt_handler(FnTimerInterruptHandler, 1, 200)    
+    register_interrupt_handler(FnGPIOInterruptHandler, 1, 200)    
 
 /* ----------------------------------------------------------------------------
  *                           External Function
  * ----------------------------------------------------------------------------
 */  
-    void FnTimerInterruptHandler(void);
-    unsigned FnTimerInterruptGetTime(hwtimer_t Var);
+    void FnGPIOInterruptHandler(void);
+
 /* ----------------------------------------------------------------------------
  *                           Global Variable
  * ----------------------------------------------------------------------------
 */ 
+  static uint8_t RisingFallingEdge;  //current code generates on rising edge!
+  static uint8_t uifeedback,uiStatus;
+  static uint8_t uiCurrentState;
 /* ----------------------------------------------------------------------------
  *                           Function Definition
  * ----------------------------------------------------------------------------
@@ -109,15 +113,22 @@
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-void FnTimerInterruptUpdate(hwtimer_t Var)
+void FnGPIOInterruptStop(port_t Var)
 {
-    unsigned time;
     DISABLE_INTERRUPTS( );
     asm volatile("setc res[%0], %1"::"r"(Var),"r"(XS1_SETC_COND_NONE));
-    time = FnTimerInterruptGetTime(Var);
-    time += ui1Sec;
-    asm volatile("setd res[%0], %1"::"r"(Var),"r"(time));
-    asm volatile("setc res[%0], %1"::"r"(Var),"r"(XS1_SETC_COND_AFTER));
+}
+/***********************************************************************
+ * Function Name: main 
+ * Arguments	  : void
+ * Return Type	: int
+ * Details	    : main function, start of the code
+ * *********************************************************************/
+void FnGPIOInterruptUpdate(port_t Var, uint8_t value)
+{
+    FnGPIOInterruptStop(Var);
+    asm volatile("setd res[%0], %1"::"r"(Var),"r"(value));
+    asm volatile("setc res[%0], %1"::"r"(Var),"r"(XS1_SETC_COND_EQ));
 }    
 /***********************************************************************
  * Function Name: main 
@@ -125,28 +136,40 @@ void FnTimerInterruptUpdate(hwtimer_t Var)
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-void FnTimerInterruptStop(hwtimer_t Var)
-{
-    DISABLE_INTERRUPTS( );
-    asm volatile("setc res[%0], %1"::"r"(Var),"r"(XS1_SETC_COND_NONE));
-}
+void FnGPIOInterruptInit(port_t Var)
+{  set_interrupt_handler(FnGPIOInterruptHandler, 1, Var, 0);  }
 /***********************************************************************
  * Function Name: main 
  * Arguments	: void
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-void FnTimerInterruptInit(hwtimer_t Var)
+void FnGPIOInterruptStart(port_t Var,uint8_t status)
 {
-    set_interrupt_handler(FnTimerInterruptHandler, 1, Var, 0);
+    RisingFallingEdge = status; 
+    FnGPIOInterruptUpdate(Var,status);
 }
 /***********************************************************************
  * Function Name: main 
- * Arguments	: void
+ * Arguments	  : void
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-void FnTimerInterruptStart(hwtimer_t Var)
+void FnGPIOInterruptManage(port_t Var)
 {
-    FnTimerInterruptUpdate(Var);
+  //manipulation to get the interrupt on rising/falling edge only
+  uifeedback = port_peek(Var); 
+  FnGPIOInterruptUpdate(Var, uiCurrentState);
+  uiCurrentState = !uiCurrentState;
+
+  if (RisingFallingEdge == irqGPIO_RISING_EDGE)
+  {  
+    if   (( uifeedback == 1 ) && (uiStatus == 0)){ printf("~1\n"); FnGPIOInterruptHandler( ); uiStatus = 1;}
+  else if ((uifeedback == 0 ) && (uiStatus == 1)){ uiStatus = 0;   }
+  }
+  else
+  {
+    if   (( uifeedback == 1 ) && (uiStatus == 0)){ uiStatus = 0;}
+  else if ((uifeedback == 0 ) && (uiStatus == 1)){ printf("~2\n");FnGPIOInterruptHandler( );  uiStatus = 1;}
+  }
 }

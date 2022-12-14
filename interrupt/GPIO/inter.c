@@ -125,7 +125,7 @@ DEFINE_INTERRUPT_PERMITTED(interrupt_handlers, void, interruptable_task, void)
  * *********************************************************************/
 DEFINE_INTERRUPT_CALLBACK (interrupt_handlers, interrupt_task, button)
 {
-  //manipulation to get the interrupt on rsising edge only
+  //manipulation to get the interrupt on rising edge only
   port_set_trigger_in_not_equal(button1, RisingFallingEdge);
   RisingFallingEdge = !RisingFallingEdge;
   uifeedback = port_peek(button1); 

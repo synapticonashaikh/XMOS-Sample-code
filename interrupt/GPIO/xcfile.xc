@@ -161,7 +161,7 @@ void WhileTwoLoop(void)
  * *********************************************************************/
 void FnParallel(void)
 {
-  printf("Para start\n");
+  printf("Parallel processing started\n");
   par
     {
       WhileOneLoop( );

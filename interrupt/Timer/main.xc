@@ -133,22 +133,16 @@ unsigned FnTimerInterruptGetTime(hwtimer_t Var)
 void FnInfiniteLoop(void)
 {
     timer    stTime;
-    uint64_t uiTimeTotal;
-    uint32_t uiCount=0; 
-
+    uint64_t uiTimeTotal; uint32_t uiCount=0; 
     stTime :> uiTimeTotal;
     uiTimeTotal = uiTimeTotal + ui1Sec ;   
     while(SET)
     {    
-        stTime when timerafter(uiTimeTotal) :> void;    
-        uiTimeTotal = uiTimeTotal + ui1Sec ;   
-        uiCount++;
-        printf("S=%u\n\r",uiCount); 
-        if (uiCount == 10 ) 
-            FnTimerInterruptStop(varTimerInterrupt);                         
+        stTime when timerafter(uiTimeTotal):> void;    
+        uiTimeTotal = uiTimeTotal + ui1Sec ; uiCount++;
+        printf("S=%u\n\r",uiCount);                   
     }
 }
-
 /* ----------------------------------------------------------------------------
  *                           Start of the code
  * ----------------------------------------------------------------------------
@@ -161,8 +155,9 @@ void FnInfiniteLoop(void)
  * *********************************************************************/
 int main( )
 {
+    /*start should come before init (to update the time)*/
+    FnTimerInterruptStart(varTimerInterrupt);    
     FnTimerInterruptInit(varTimerInterrupt);
-    
     FnInfiniteLoop( );
     return RESET;
 }
