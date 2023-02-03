@@ -96,7 +96,7 @@
  * ----------------------------------------------------------------------------
 */
 
-    out port led_ports = PORT4A;
+    out port led_ports = PORT4C;
     int count = RESET;
 	
 /* ----------------------------------------------------------------------------
@@ -131,7 +131,7 @@ int main ( )
         printf("LED OFF--[%d]!\n\r",count);
         delay_milliseconds(1000) ; //this function does not work in simulation
 
-        led_ports <: (uint8_t)0x0E; 
+        led_ports <: (uint8_t)0x00; 
         printf("LED ON --[%d]!\n\r",count);
         delay_milliseconds(1000) ; //this function does not work in simulation
     }

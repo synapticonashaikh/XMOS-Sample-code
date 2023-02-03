@@ -89,6 +89,7 @@
   #include <xcore/port.h>
   #include <xcore/interrupt.h>
   #include <xcore/interrupt_wrappers.h>
+  
 /* ----------------------------------------------------------------------------
  *                           External Function
  * ----------------------------------------------------------------------------
@@ -151,9 +152,11 @@ void GPIOINTRWrapper(void)
  * *********************************************************************/
 void GPIOInterrupt(void)
 {
+  
   port_enable(button1);
   triggerable_setup_interrupt_callback(button1, &button1, INTERRUPT_CALLBACK(interrupt_task));
   port_set_trigger_in_not_equal(button1, 1);
   port_clear_trigger_in(button1);
   triggerable_enable_trigger(button1);
+
 }
