@@ -99,7 +99,7 @@
 	 in port iPort4A = PORT1A ;
   out port OPort4A = PORT4A ;
   timer timev;
-  int64_t CompareTime = ;
+  int64_t CompareTime ;
 
 
 /* ----------------------------------------------------------------------------

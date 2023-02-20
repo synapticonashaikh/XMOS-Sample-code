@@ -15,7 +15,7 @@
 /*****************************************/
 #define FL_QUADDEVICE_AT25FF321A \
 { \
-    0,                      /* UNKNOWN */ \
+    44,                     /* UNKNOWN */ \
     256,                    /* page size */ \
     16384,                  /* num pages */ \
     3,                      /* address size */ \
