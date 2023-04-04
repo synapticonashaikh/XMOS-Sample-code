@@ -91,15 +91,15 @@
  *                           External Function
  * ----------------------------------------------------------------------------
 */  
-    extern void FnTimerInterruptInit (hwtimer_t Var); 
-    extern void FnTimerInterruptStart(hwtimer_t Var);    
+    extern void FnTimerInterruptStart(hwtimer_t Var, uint32_t TimeInMsec); 
+    extern void FnTimerInterruptInit (hwtimer_t Var);    
     extern void FnTimerInterruptStop (hwtimer_t Var);  
 
 /* ----------------------------------------------------------------------------
  *                           Global Variable
  * ----------------------------------------------------------------------------
 */ 
-    hwtimer_t varTimerInterrupt;
+    hwtimer_t varTimerInterrupt;   
 /* ----------------------------------------------------------------------------
  *                           Function Definition
  * ----------------------------------------------------------------------------
@@ -112,7 +112,7 @@
  * *********************************************************************/
 void FnTimerInterruptHandler(void)
 {
-    FnTimerInterruptStart(varTimerInterrupt);
+    FnTimerInterruptInit(varTimerInterrupt);
     printstr("Inside timer isr ...\n");
 }                             
 /***********************************************************************
@@ -155,9 +155,9 @@ void FnInfiniteLoop(void)
  * *********************************************************************/
 int main( )
 {
-    /*start should come before init (to update the time)*/
-    FnTimerInterruptStart(varTimerInterrupt);    
-    FnTimerInterruptInit(varTimerInterrupt);
+    /*start should come before init (to update the time)*/   
+    FnTimerInterruptInit(varTimerInterrupt);     
+    FnTimerInterruptStart(varTimerInterrupt,500);
     FnInfiniteLoop( );
     return RESET;
 }

@@ -99,6 +99,8 @@
  *                           Global Variable
  * ----------------------------------------------------------------------------
 */ 
+    uint32_t globalTimer = RESET;
+    
 /* ----------------------------------------------------------------------------
  *                           Function Definition
  * ----------------------------------------------------------------------------
@@ -115,7 +117,7 @@ void FnTimerInterruptUpdate(hwtimer_t Var)
     DISABLE_INTERRUPTS( );
     asm volatile("setc res[%0], %1"::"r"(Var),"r"(XS1_SETC_COND_NONE));
     time = FnTimerInterruptGetTime(Var);
-    time += ui1Sec;
+    time += ui1mSec * globalTimer;
     asm volatile("setd res[%0], %1"::"r"(Var),"r"(time));
     asm volatile("setc res[%0], %1"::"r"(Var),"r"(XS1_SETC_COND_AFTER));
 }    
@@ -136,8 +138,9 @@ void FnTimerInterruptStop(hwtimer_t Var)
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-void FnTimerInterruptInit(hwtimer_t Var)
+void FnTimerInterruptStart(hwtimer_t Var, uint32_t TimeInMsec)
 {
+    globalTimer = TimeInMsec ;
     set_interrupt_handler(FnTimerInterruptHandler, 1, Var, 0);
 }
 /***********************************************************************
@@ -146,7 +149,7 @@ void FnTimerInterruptInit(hwtimer_t Var)
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-void FnTimerInterruptStart(hwtimer_t Var)
+void FnTimerInterruptInit(hwtimer_t Var)
 {
     FnTimerInterruptUpdate(Var);
 }
