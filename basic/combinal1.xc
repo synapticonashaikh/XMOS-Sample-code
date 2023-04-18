@@ -1,3 +1,5 @@
+
+
 /**************************************************************************************
  **************************************************************************************
  ______________________________________________________________________________________
@@ -7,11 +9,11 @@
  ______________________________________________________________________________________
 
   File Name:
-	parallel.xc
+	hello.xc
  ______________________________________________________________________________________
 
   Summary:
-    This file contains the source code to get the gpio interrupt.
+    This file contains the source code for printing "Hello world" on the terminal.
  ______________________________________________________________________________________
 
   Description:
@@ -76,110 +78,115 @@
   *************************************************************************************/
 
 /* ----------------------------------------------------------------------------
- *                           Macros
+ *                           MACROS
  * ----------------------------------------------------------------------------
 */
+
+
 /* ----------------------------------------------------------------------------
  *                           Includes
  * ----------------------------------------------------------------------------
 */
+
 	/*Standard Header files*/
-	#include "header.h"	
-    #include <hwtimer.h>    
+	#include "header.h"
+        
 
 /* ----------------------------------------------------------------------------
- *                           External Function
+ *                          GLOBAL VARIABLE DECLARATION
  * ----------------------------------------------------------------------------
-*/  
-    extern void FnGPIOInterruptInit (port Var); 
-    extern void FnGPIOInterruptStart(port Var,uint8_t status);    
-    extern void FnGPIOInterruptStop (port Var);  
-    extern void FnGPIOInterruptManage(port Var);
+*/
+    interface upyInterface { void SendCommand(int cmd);};
+
+    interface upycommand   { void CheckCommand(int cmd);};
 
 /* ----------------------------------------------------------------------------
- *                           Global Variable
+ *                           Fnction Definitions
  * ----------------------------------------------------------------------------
-*/ 
-    port varGPIOInterrupt = XS1_PORT_1P;
-    uint8_t TimerInterruptFlag = RESET;
-/* ----------------------------------------------------------------------------
- *                           Function Definition
- * ----------------------------------------------------------------------------
-*/ 
-/***********************************************************************
- * Function Name: FnGPIOInterruptHandler 
- * Arguments	: void
- * Return Type	: void
- * Details	    : 
- * *********************************************************************/
-void FnGPIOInterruptHandler(void)
-{
-    /*inside the callback it is important to have manage function
-      So that it can manipulate the interrupt to rising/ falling edge only*/  
-    //FnGPIOInterruptManage(varGPIOInterrupt);  
-   TimerInterruptFlag = SET;
-   printstr("");
-}   
-/***********************************************************************
- * Function Name: FnGPIOInterruptHandler 
- * Arguments	: void
- * Return Type	: void
- * Details	    : 
- * *********************************************************************/
-void FnTimerProcess(void)
+*/
+[[combinable]]
+void fnMicroPython_Service(server interface upyInterface upc)
 {
 
-        if ( TimerInterruptFlag == SET )
-        {    TimerInterruptFlag = RESET;
-             printf("Timer Process!\n\r");
-             //FnGPIOInterruptStop(varGPIOInterrupt);
+  int flag = 0;
 
+    while (SET) 
+    {
+
+        select 
+        {
+            case  upc.SendCommand(int cmd):
+                  switch(cmd)
+                  {
+                    case 1: printf("Script is running!\n"); flag = 1; break;
+                    case 2: printf("Script stop running!\n"); break;
+                  }
+            break ;
         }
-}
+        if (flag == 1)
+        {
 
+          
+        }
 
-
-
-/***********************************************************************
- * Function Name: main 
- * Arguments	: void
- * Return Type	: int
- * Details	    : main function, start of the code
- * *********************************************************************/
-void FnInfiniteLoop(void)
-{
-    timer    stTime;
-    uint64_t uiTimeTotal; uint32_t uiCount=0; 
-    
-    stTime :> uiTimeTotal;
-    uiTimeTotal = uiTimeTotal + ui1Sec ;   
-    while(SET)
-    {    
-        stTime when timerafter(uiTimeTotal):> void;    
-        uiTimeTotal = uiTimeTotal + ui1mSec ; uiCount++;
-        //printf("S=%u\n\r",uiCount);                   
-
-        FnTimerProcess( );
     }
 }
 
 
+[[combinable]]
+void fnMicroPython_Commands(client interface upyInterface upc, server interface upycommand sendata)
+{
+    while (SET) 
+    {
+        select 
+        {
+          case sendata.CheckCommand(int cmd):
+               printf("Before Send command\n");
+               upc.SendCommand(1);
+               printf("After Send command\n"); 
+          break;
+        }
+    }
+}
+
+
+[[distributable]]
+void StartTheCode (client interface upycommand sendata)
+{
+  sendata.CheckCommand(1);
+  while (1){select{}}
+}
+
 
 /* ----------------------------------------------------------------------------
- *                           Start of the code
+ *                           important command
  * ----------------------------------------------------------------------------
-*/ 
+*/
+	//xcc -target=XCORE-200-EXPLORER file_location/hello.c -o output_location/helloworld.xe
+	//xsim output_location/helloworld.xe
+	//xrun --io output_location/helloworld.xe
+
 /***********************************************************************
  * Function Name: main 
  * Arguments	: void
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-int main( )
+int main ( ) 
 {
-    /*start should come before init (to update the time)*/   
-    FnGPIOInterruptStart(varGPIOInterrupt,irqGPIO_RISING_EDGE);    
-    FnGPIOInterruptInit (varGPIOInterrupt);     
-    FnInfiniteLoop( );
-    return RESET;
+
+    interface upyInterface   upc;
+    interface upycommand sendata;
+    par 
+    {
+
+          on tile [TILE0].core[0]: fnMicroPython_Service  ( upc ) ;
+          on tile [TILE0].core[0]: fnMicroPython_Commands ( upc , sendata ) ;
+          
+          on tile [TILE0].core[1]: StartTheCode(sendata);
+    }
+
+return RESET;
 }
+
+

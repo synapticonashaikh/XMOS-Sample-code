@@ -84,79 +84,102 @@
  * ----------------------------------------------------------------------------
 */
   #include <stdio.h>
-  #include <xcore/hwtimer.h>
   #include <xcore/triggerable.h>
   #include <xcore/port.h>
   #include <xcore/interrupt.h>
   #include <xcore/interrupt_wrappers.h>
+  #include "header.h"
   
 /* ----------------------------------------------------------------------------
  *                           External Function
  * ----------------------------------------------------------------------------
 */ 
-  extern void CallbackFunction(void);
   extern void FnParallel(void);
+  extern void WhileThreeLoop(void);
 /* ----------------------------------------------------------------------------
  *                           GLOBAL VARIABLE DECLARATION
  * ----------------------------------------------------------------------------
 */
-  port_t button1 = XS1_PORT_1P;
-  static uint8_t RisingFallingEdge; //current code generates on rising edge!
-  static uint8_t uifeedback,uiStatus;
+  port_t  button1  = PORT4D;  //As on AI eval board, the available switches are on 4D port
+  uint8_t RisingFallingEdge;  //current code generates on rising edge!
+  uint8_t uifeedback,uiStatus;
+
 /* ----------------------------------------------------------------------------
  *                           Fnction Definitions
  * ----------------------------------------------------------------------------
 */
 /***********************************************************************
- * Function Name: main 
+ * Function Name: Function1 
  * Arguments	  : void
- * Return Type	: int
- * Details	    : main function, start of the code
+ * Return Type	: void
+ * Details	    : A callback function
+ * *********************************************************************/
+void CallbackFunction(void)
+{
+    static int CallbackCount = RESET;
+    CallbackCount++;
+  	printf ("CALLBACK FUNCTION=%d\n\r",CallbackCount);
+}
+
+/***********************************************************************
+ * Function Name: DEFINE_INTERRUPT_PERMITTED 
+ * Arguments	  : 
+ * Return Type	: 
+ * Details	    : 
  * *********************************************************************/
 DEFINE_INTERRUPT_PERMITTED(interrupt_handlers, void, interruptable_task, void)
 {
   interrupt_unmask_all( ); 
-  FnParallel( );
+  //WhileThreeLoop( );
+  //interrupt_mask_all( );
 }
 /***********************************************************************
- * Function Name: main 
- * Arguments	  : void
- * Return Type	: int
- * Details	    : main function, start of the code
+ * Function Name: DEFINE_INTERRUPT_CALLBACK 
+ * Arguments	  : 
+ * Return Type	: 
+ * Details	    : 
  * *********************************************************************/
 DEFINE_INTERRUPT_CALLBACK (interrupt_handlers, interrupt_task, button)
 {
-  //manipulation to get the interrupt on rising edge only
-  port_set_trigger_in_not_equal(button1, RisingFallingEdge);
-  RisingFallingEdge = !RisingFallingEdge;
-  uifeedback = port_peek(button1); 
-  if      (( uifeedback == 1 ) && (uiStatus == 0))
-          { CallbackFunction( ); uiStatus = 1;}
-  else if ((uifeedback == 0 ) && (uiStatus == 1)) 
-          { uiStatus = 0;   }
+  //To manipulate the interrupt trigger to get the interrupt on the rising edge only.
+   RisingFallingEdge = !RisingFallingEdge;
+  port_set_trigger_in_not_equal(button1, RisingFallingEdge); //change the trigger for the port/ pin
+  uifeedback = port_peek(button1); //read the current status
+
+  if (( uifeedback == SET ) 
+  &&  ( uiStatus == RESET ))
+      { uiStatus  =   SET;
+      }
+
+  else 
+  if (( uifeedback == RESET ) 
+  &&  ( uiStatus   ==   SET )) 
+      { uiStatus    = RESET; 
+        CallbackFunction( );      
+      }
+
 }
 
 /***********************************************************************
- * Function Name: main 
+ * Function Name: GPIOINTRWrapper 
  * Arguments	  : void
- * Return Type	: int
- * Details	    : main function, start of the code
+ * Return Type	: void
+ * Details	    : 
  * *********************************************************************/
 void GPIOINTRWrapper(void)
 { INTERRUPT_PERMITTED(interruptable_task)( ); }
 /***********************************************************************
- * Function Name: main 
+ * Function Name: GPIOInterrupt 
  * Arguments	  : void
- * Return Type	: int
- * Details	    : main function, start of the code
+ * Return Type	: void
+ * Details	    : 
  * *********************************************************************/
 void GPIOInterrupt(void)
 {
-  
   port_enable(button1);
   triggerable_setup_interrupt_callback(button1, &button1, INTERRUPT_CALLBACK(interrupt_task));
-  port_set_trigger_in_not_equal(button1, 1);
+  port_set_trigger_in_not_equal(button1, RESET);
   port_clear_trigger_in(button1);
   triggerable_enable_trigger(button1);
-
+  GPIOINTRWrapper( );
 }

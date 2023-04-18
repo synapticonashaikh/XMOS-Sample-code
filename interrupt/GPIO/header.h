@@ -148,16 +148,16 @@
     //as the system is working on 100Mhz, the unit time of a cycle is 10ns
     #define    uiUnitTimeMul (uint8_t)10
     #define    ui10nSec      (uint8_t)1 
-    #define    ui100nSec     (uint8_t)(ui10nSec   * uiUnitTimeMul)
+    #define    ui100nSec     (uint32_t)(ui10nSec   * uiUnitTimeMul)
 
-    #define    ui1uSec       (uint16_t)(ui100nSec * uiUnitTimeMul)
-    #define    ui10uSec      (uint16_t)(ui1uSec   * uiUnitTimeMul)
-    #define    ui100uSec     (uint32_t)(ui10uSec  * uiUnitTimeMul)
+    #define    ui1uSec       (uint64_t)(ui100nSec * uiUnitTimeMul)
+    #define    ui10uSec      (uint64_t)(ui1uSec   * uiUnitTimeMul)
+    #define    ui100uSec     (uint64_t)(ui10uSec  * uiUnitTimeMul)
 
-    #define    ui1mSec       (uint32_t)(ui100uSec * uiUnitTimeMul)
-    #define    ui10mSec      (uint32_t)(ui1mSec   * uiUnitTimeMul)
-    #define    ui100mSec     (uint32_t)(ui10mSec  * uiUnitTimeMul)
-    #define    ui1Sec        (uint32_t)(ui100mSec * uiUnitTimeMul)
+    #define    ui1mSec       (uint64_t)(ui100uSec * uiUnitTimeMul)
+    #define    ui10mSec      (uint64_t)(ui1mSec   * uiUnitTimeMul)
+    #define    ui100mSec     (uint64_t)(ui10mSec  * uiUnitTimeMul)
+    #define    ui1Sec        (uint64_t)(ui100mSec * uiUnitTimeMul)
 
 
 /* ----------------------------------------------------------------------------

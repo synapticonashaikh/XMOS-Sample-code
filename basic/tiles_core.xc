@@ -107,19 +107,13 @@
  * Return Type	: void
  * Details	    : print the task number
  * *********************************************************************/
-void FnTask1_1(void)
-{
-  a = 2 ;
-  printf("Currently on task1_1\n\r"); 
-}
-
 void FnTask1(void)
 {
   a = 3 ;
     while (SET)
     { 
       delay_milliseconds(1000) ; //this function does not work in simulation 
-      FnTask1_1(); printf("Currently on task1\n\r"); }
+      printf("Currently on task1\n\r"); }
 }
 
 void FnTask2(void)

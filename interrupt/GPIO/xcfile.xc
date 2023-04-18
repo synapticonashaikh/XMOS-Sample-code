@@ -7,7 +7,7 @@
  ______________________________________________________________________________________
 
   File Name:
-	parallel.xc
+	xcfile.xc
  ______________________________________________________________________________________
 
   Summary:
@@ -85,42 +85,33 @@
 */
 	/*Standard Header files*/
 		#include "header.h"	
+
 /* ----------------------------------------------------------------------------
  *                           External Function
  * ----------------------------------------------------------------------------
 */  
-  extern "C" {  void GPIOInterrupt(void); void GPIOINTRWrapper(void); }        
+  extern "C" {  
+    void GPIOInterrupt(void); }        
 /* ----------------------------------------------------------------------------
  *                           GLOBAL VARIABLE DECLARATION
  * ----------------------------------------------------------------------------
 */
-    timer stTime1,stTime2;    
-    int CallbackCount = 0;
+    timer stTime1, stTime2, stTime3;    
+   
 /* ----------------------------------------------------------------------------
  *                           Fnction Definitions
  * ----------------------------------------------------------------------------
 */
 /***********************************************************************
- * Function Name: Function1 
+ * Function Name: WhileOneLoop 
  * Arguments	  : void
  * Return Type	: void
- * Details	    : Just a callback function
- * *********************************************************************/
-void CallbackFunction(void)
-{
-    CallbackCount++;
-  	printf ("CALLBACK FUNCTION=%d\n\r",CallbackCount);
-}
-/***********************************************************************
- * Function Name: Function1 
- * Arguments	  : void
- * Return Type	: void
- * Details	    : Just a callback function
+ * Details	    : 1 second timer
  * *********************************************************************/
 void WhileOneLoop(void)
 {
   uint64_t uiTimeTotal;
-  uint32_t uiCount=0; 
+  uint32_t uiCount=RESET; 
   stTime1 :> uiTimeTotal;
   uiTimeTotal = uiTimeTotal + ui1Sec ;   
   while (SET)
@@ -133,31 +124,52 @@ void WhileOneLoop(void)
 }
 
 /***********************************************************************
- * Function Name: Function1 
+ * Function Name: WhileTwoLoop 
  * Arguments	  : void
  * Return Type	: void
- * Details	    : Just a callback function
+ * Details	    : 1 second timer
  * *********************************************************************/
 void WhileTwoLoop(void)
 {
+    uint64_t uiTimeTotal;
+    uint32_t uiCount= RESET; 
+    stTime2 :> uiTimeTotal;
+    uiTimeTotal = uiTimeTotal + ui1Sec ;   
+    while (SET)
+    {
+        stTime2 when timerafter(uiTimeTotal) :> void;    
+        uiTimeTotal = uiTimeTotal + ui1Sec ;   
+        uiCount++;
+        printf("2S=%u\n\r",uiCount);    
+    }    
+}
+
+/***********************************************************************
+ * Function Name: WhileThreeLoop 
+ * Arguments	  : void
+ * Return Type	: void
+ * Details	    : 1 second timer
+ * *********************************************************************/
+void WhileThreeLoop(void)
+{
   uint64_t uiTimeTotal;
-  uint32_t uiCount=0; 
-  stTime2 :> uiTimeTotal;
+  uint32_t uiCount= RESET; 
+  stTime3 :> uiTimeTotal;
   uiTimeTotal = uiTimeTotal + ui1Sec ;   
   while (SET)
   {
-      stTime2 when timerafter(uiTimeTotal) :> void;    
+      stTime3 when timerafter(uiTimeTotal) :> void;    
       uiTimeTotal = uiTimeTotal + ui1Sec ;   
       uiCount++;
-      printf("2S=%u\n\r",uiCount);    
+      printf("3S=%u\n\r",uiCount);    
   }    
 }
 
 /***********************************************************************
- * Function Name: Function1 
+ * Function Name: FnParallel 
  * Arguments	  : void
  * Return Type	: void
- * Details	    : Just a callback function
+ * Details	    : 
  * *********************************************************************/
 void FnParallel(void)
 {
@@ -165,23 +177,27 @@ void FnParallel(void)
   par
     {
       WhileOneLoop( );
-      WhileTwoLoop( );
-    }
+      WhileTwoLoop( ); 
+      WhileThreeLoop( );
+    }  
 }
 
+//xcc -target=XCORE-AI-EXPLORER xcfile.xc inter.c -o output.xe
 /***********************************************************************
  * Function Name: main 
  * Arguments	  : void
  * Return Type	: int
  * Details	    : main function, start of the code
  * *********************************************************************/
-int main ( )
+int main (void)
 {
-  printf("start of the code!\n\r");
-  GPIOInterrupt( );
-  GPIOINTRWrapper( );
+    par 
+    {
+     GPIOInterrupt ( ); 
+     FnParallel( );    
+    }
+
  /*control should not reach here*/   
  return RESET;   
 }
 
-  
