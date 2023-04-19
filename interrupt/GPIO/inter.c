@@ -94,13 +94,12 @@
  *                           External Function
  * ----------------------------------------------------------------------------
 */ 
-  extern void FnParallel(void);
-  extern void WhileThreeLoop(void);
 /* ----------------------------------------------------------------------------
  *                           GLOBAL VARIABLE DECLARATION
  * ----------------------------------------------------------------------------
 */
-  port_t  button1  = PORT4D;  //As on AI eval board, the available switches are on 4D port
+
+  extern port_t button1;
   uint8_t RisingFallingEdge;  //current code generates on rising edge!
   uint8_t uifeedback,uiStatus;
 
@@ -130,7 +129,6 @@ void CallbackFunction(void)
 DEFINE_INTERRUPT_PERMITTED(interrupt_handlers, void, interruptable_task, void)
 {
   interrupt_unmask_all( ); 
-  //WhileThreeLoop( );
   //interrupt_mask_all( );
 }
 /***********************************************************************
@@ -149,6 +147,7 @@ DEFINE_INTERRUPT_CALLBACK (interrupt_handlers, interrupt_task, button)
   if (( uifeedback == SET ) 
   &&  ( uiStatus == RESET ))
       { uiStatus  =   SET;
+
       }
 
   else 
@@ -157,8 +156,16 @@ DEFINE_INTERRUPT_CALLBACK (interrupt_handlers, interrupt_task, button)
       { uiStatus    = RESET; 
         CallbackFunction( );      
       }
-
 }
+
+/***********************************************************************
+ * Function Name: FnGpioRead 
+ * Arguments	  : void
+ * Return Type	: void
+ * Details	    : 
+ * *********************************************************************/
+int FnGpioRead(port_t PortVar)
+{ return port_peek(PortVar); }
 
 /***********************************************************************
  * Function Name: GPIOINTRWrapper 
@@ -177,7 +184,8 @@ void GPIOINTRWrapper(void)
 void GPIOInterrupt(void)
 {
   port_enable(button1);
-  triggerable_setup_interrupt_callback(button1, &button1, INTERRUPT_CALLBACK(interrupt_task));
+  triggerable_setup_interrupt_callback
+  (button1, &button1, INTERRUPT_CALLBACK(interrupt_task));
   port_set_trigger_in_not_equal(button1, RESET);
   port_clear_trigger_in(button1);
   triggerable_enable_trigger(button1);

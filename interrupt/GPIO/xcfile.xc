@@ -91,13 +91,15 @@
  * ----------------------------------------------------------------------------
 */  
   extern "C" {  
-    void GPIOInterrupt(void); }        
+    void GPIOInterrupt(void);
+    int FnGpioRead(port PortVar); }        
 /* ----------------------------------------------------------------------------
  *                           GLOBAL VARIABLE DECLARATION
  * ----------------------------------------------------------------------------
 */
     timer stTime1, stTime2, stTime3;    
-   
+    port  button1  = PORT4D;  //As on AI eval board, the available switches are on 4D port
+
 /* ----------------------------------------------------------------------------
  *                           Fnction Definitions
  * ----------------------------------------------------------------------------
@@ -114,12 +116,13 @@ void WhileOneLoop(void)
   uint32_t uiCount=RESET; 
   stTime1 :> uiTimeTotal;
   uiTimeTotal = uiTimeTotal + ui1Sec ;   
+  //GPIOInterrupt ( ); // doesn't work
   while (SET)
   {
       stTime1 when timerafter(uiTimeTotal) :> void;    
       uiTimeTotal = uiTimeTotal + ui1Sec ;   
       uiCount++;
-      printf("1S=%u\n\r",uiCount);    
+      printf("1S=%u %u\n\r",FnGpioRead(button1),uiCount);    
   }    
 }
 
@@ -135,6 +138,7 @@ void WhileTwoLoop(void)
     uint32_t uiCount= RESET; 
     stTime2 :> uiTimeTotal;
     uiTimeTotal = uiTimeTotal + ui1Sec ;   
+    //GPIOInterrupt ( ); // doesn't work
     while (SET)
     {
         stTime2 when timerafter(uiTimeTotal) :> void;    
@@ -156,6 +160,7 @@ void WhileThreeLoop(void)
   uint32_t uiCount= RESET; 
   stTime3 :> uiTimeTotal;
   uiTimeTotal = uiTimeTotal + ui1Sec ;   
+  //GPIOInterrupt ( ); // doesn't work
   while (SET)
   {
       stTime3 when timerafter(uiTimeTotal) :> void;    
@@ -163,23 +168,6 @@ void WhileThreeLoop(void)
       uiCount++;
       printf("3S=%u\n\r",uiCount);    
   }    
-}
-
-/***********************************************************************
- * Function Name: FnParallel 
- * Arguments	  : void
- * Return Type	: void
- * Details	    : 
- * *********************************************************************/
-void FnParallel(void)
-{
-  printf("Parallel processing started\n");
-  par
-    {
-      WhileOneLoop( );
-      WhileTwoLoop( ); 
-      WhileThreeLoop( );
-    }  
 }
 
 //xcc -target=XCORE-AI-EXPLORER xcfile.xc inter.c -o output.xe
@@ -191,11 +179,16 @@ void FnParallel(void)
  * *********************************************************************/
 int main (void)
 {
-    par 
+  
+  printf("Parallel processing started\n");
+  par
     {
-     GPIOInterrupt ( ); 
-     FnParallel( );    
-    }
+      GPIOInterrupt ( ); // If I keep the interrupt init in the main par, it works. Otherwise, no!
+      WhileOneLoop  ( );
+      WhileTwoLoop  ( ); 
+      WhileThreeLoop( );
+
+    }    
 
  /*control should not reach here*/   
  return RESET;   
