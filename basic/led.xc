@@ -103,8 +103,6 @@
  *                           Fnction Definitions
  * ----------------------------------------------------------------------------
 */
-
-
 /* ----------------------------------------------------------------------------
  *                           important command
  * ----------------------------------------------------------------------------
@@ -123,17 +121,16 @@
  * *********************************************************************/
 int main ( )
 {
-
     while (SET)
     {
-        count++;
+        //count++;
         led_ports <: (uint8_t)0x0F; 
-        printf("LED OFF--[%d]!\n\r",count);
-        delay_milliseconds(1000) ; //this function does not work in simulation
+        //printf("LED OFF--[%d]!\n\r",count);
+        delay_milliseconds(25); //this function does not work in simulation
 
         led_ports <: (uint8_t)0x00; 
-        printf("LED ON --[%d]!\n\r",count);
-        delay_milliseconds(1000) ; //this function does not work in simulation
+        //printf("LED ON --[%d]!\n\r",count);
+        delay_milliseconds(25) ; //this function does not work in simulation
     }
 
 /*code should not reach here*/

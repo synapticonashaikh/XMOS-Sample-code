@@ -116,13 +116,19 @@ void WhileOneLoop(void)
   uint32_t uiCount=RESET; 
   stTime1 :> uiTimeTotal;
   uiTimeTotal = uiTimeTotal + ui1Sec ;   
-  //GPIOInterrupt ( ); // doesn't work
+  GPIOINTRWrapper(); //it doesn't matter if I add it here or not
+  /*
+   //this method of GPIO reading isn't working 
+     int temp_var, port_value
+     button1 @ temp_var :> port_value;
+     printf("4D port=%u %u\n\r", SET & port_value);
+  */
   while (SET)
   {
       stTime1 when timerafter(uiTimeTotal) :> void;    
       uiTimeTotal = uiTimeTotal + ui1Sec ;   
-      uiCount++;
-      printf("1S=%u %u\n\r",FnGpioRead(button1),uiCount);    
+      uiCount++;    
+      printf("1S=%u %u\n\r", SET & FnGpioRead(button1), uiCount);       
   }    
 }
 
@@ -138,7 +144,7 @@ void WhileTwoLoop(void)
     uint32_t uiCount= RESET; 
     stTime2 :> uiTimeTotal;
     uiTimeTotal = uiTimeTotal + ui1Sec ;   
-    //GPIOInterrupt ( ); // doesn't work
+    GPIOINTRWrapper();
     while (SET)
     {
         stTime2 when timerafter(uiTimeTotal) :> void;    
@@ -160,7 +166,7 @@ void WhileThreeLoop(void)
   uint32_t uiCount= RESET; 
   stTime3 :> uiTimeTotal;
   uiTimeTotal = uiTimeTotal + ui1Sec ;   
-  //GPIOInterrupt ( ); // doesn't work
+  GPIOINTRWrapper();
   while (SET)
   {
       stTime3 when timerafter(uiTimeTotal) :> void;    
@@ -179,16 +185,16 @@ void WhileThreeLoop(void)
  * *********************************************************************/
 int main (void)
 {
-  
+
+  //GPIOInterrupt ( ); // code will be stuck here and nothing will work
   printf("Parallel processing started\n");
   par
     {
-      GPIOInterrupt ( ); // If I keep the interrupt init in the main par, it works. Otherwise, no!
+      GPIOInterrupt ( ); // If I keep the GPIOInterrupt in the main par, it works. Otherwise, no!          
       WhileOneLoop  ( );
       WhileTwoLoop  ( ); 
       WhileThreeLoop( );
-
-    }    
+    }
 
  /*control should not reach here*/   
  return RESET;   

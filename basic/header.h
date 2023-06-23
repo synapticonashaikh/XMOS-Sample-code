@@ -180,12 +180,17 @@
 
 
         /*XMOS related hedaer*/
-        #include <platform.h>
+			
+#ifdef __XC__
+		#include <platform.h>			
         #include <xs1.h>
         #include <timer.h>
         #include <flash.h>
-		#include <print.h>							  
-
+		#include <print.h>			
+#elif !defined  __GNUC__	
+		 #include <platform.h>	
+		 #include <xcore/hwtimer.h>		
+#endif
 
 /* ----------------------------------------------------------------------------
  *                           STRUCTURE VARIABLES
@@ -240,8 +245,9 @@
 	/*********Timer structure **********/
 	typedef struct 
 	{
-
+#ifdef __XC__		
 		timer    stTime;
+#endif		
 		uint64_t uiCompareTime;
 		TIMERF	 TimerFlag;
 

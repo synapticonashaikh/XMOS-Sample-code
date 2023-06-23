@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "*.xc": "cpp",
+        "string.h": "c",
+        "header.h": "c",
+        "unistd.h": "c",
+        "*.tcc": "c",
+        "exception": "c",
+        "memory_resource": "c",
+        "iosfwd": "c",
+        "new": "c",
+        "ostream": "c",
+        "streambuf": "c"
+    }
+}

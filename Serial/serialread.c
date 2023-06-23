@@ -7,7 +7,7 @@
  ______________________________________________________________________________________
 
   File Name:
-	parallel.xc
+	hello.xc
  ______________________________________________________________________________________
 
   Summary:
@@ -76,120 +76,175 @@
   *************************************************************************************/
 
 /* ----------------------------------------------------------------------------
- *                           Macros
+ *                           MACROS
  * ----------------------------------------------------------------------------
 */
+
+
 /* ----------------------------------------------------------------------------
  *                           Includes
  * ----------------------------------------------------------------------------
 */
-  #include <stdio.h>
-  #include <xcore/triggerable.h>
-  #include <xcore/port.h>
-  #include <xcore/interrupt.h>
-  #include <xcore/interrupt_wrappers.h>
-  #include "header.h"
-  
+
+	/*Standard Header files*/
+	  #include "header.h"      
+    #include "unistd.h"
+    #include "string.h"
+
+    #define _SERAIL_MODE_COMMAND    1     
+    #define _SERAIL_MODE_DATA       2     
+
+    #define _SERIAL_RX_SIZE         1000
+    #define _CODE_BUFFER_SIZE       5000
+
+
 /* ----------------------------------------------------------------------------
- *                           External Function
+ *                          GLOBAL VARIABLE DECLARATION
  * ----------------------------------------------------------------------------
-*/ 
+*/
+        char ReciverBuffer[_SERIAL_RX_SIZE], 
+        CodeBuffer[_CODE_BUFFER_SIZE],
+        SingleChar ;
+        uint32_t ReceiveCount = RESET, CodeReceiveCount = RESET;
+        uint8_t ucMode = _SERAIL_MODE_COMMAND ;
+        char  cprint[100]; 
+        uint32_t uiCodeSize = RESET;
+
 /* ----------------------------------------------------------------------------
- *                           GLOBAL VARIABLE DECLARATION
+ *                          GLOBAL VARIABLE DECLARATION
  * ----------------------------------------------------------------------------
 */
 
-  extern port_t button1;
-  uint8_t RisingFallingEdge;  //current code generates on rising edge!
-  uint8_t uifeedback,uiStatus;
+/***********************************************************************
+ * Function Name : main 
+ * Arguments	 : void
+ * Return Type	 : int
+ * Details	     : main function, start of the code
+ * *********************************************************************/
+int FnReceiveCharacter(void)
+{      
+    unsigned char c = RESET, d;
+    d = read(STDIN_FILENO, &c, 1);
+    fflush(stdin);
+    return c;
+}  
+
+/***********************************************************************
+ * Function Name : main 
+ * Arguments	   : void
+ * Return Type	 : int
+ * Details	     : main function, start of the code
+ * *********************************************************************/
+void FnTransmitCharacter(const char *str) 
+{ 
+    unsigned char d;   
+    uint32_t len = strlen(str);
+    if(len!= RESET )
+      d = write(STDOUT_FILENO, str, len);
+    fflush(stdout); 
+}
+
+/***********************************************************************
+ * Function Name : main 
+ * Arguments	   : void
+ * Return Type	 : int
+ * Details	     : main function, start of the code
+ * *********************************************************************/
+void FnReceiveProcess(char *Data)
+{ 
+
+         if ( strstr(Data, "# check $") != RESET)
+            { FnTransmitCharacter("Device is active!\n\r");         }
+    else if ( strstr(Data, "# status $") != RESET )     
+            {  FnTransmitCharacter("Status: Code is standby!\n\r"); }
+    else if ( strstr(Data, "# codesize") != RESET )     
+            {   
+              if (strchr(Data, '$') != RESET )
+                 {
+                    char * ucChar   = strstr (Data,"codesize");
+                    char * uc1Space = strchr (ucChar,' ');  uc1Space ++;   
+                    char * uc2Space = strrchr(ucChar,' '); *uc2Space = RESET;
+                    uiCodeSize = strtol(uc1Space,NULL,(uint8_t)10);
+                    sprintf(cprint,"Status: code size = %d\n\r",uiCodeSize);
+                    FnTransmitCharacter(cprint);  
+                 }
+               else goto down1;  
+            }
+    else if ( strstr(Data, "# modechange $") != RESET )     
+            {
+              if( uiCodeSize !=  RESET )
+                { ucMode      = _SERAIL_MODE_DATA;
+                  FnTransmitCharacter("Status: Mode Changed\n\r"); }            
+              else goto down1;  
+            }
+    else   {  down1: 
+              sprintf(cprint,"unknow data = %s",Data);
+              FnTransmitCharacter(cprint);  }       
+}
+
+
+/***********************************************************************
+ * Function Name : main 
+ * Arguments	   : void
+ * Return Type	 : int
+ * Details	     : main function, start of the code
+ * *********************************************************************/
+void FnCommandReceive(void)
+{
+        FnTransmitCharacter("Enter data: ");
+        while (SET)
+        {
+            if (ucMode == _SERAIL_MODE_COMMAND)
+            {
+                     //hwtimer_delay(t,100000);
+                     SingleChar  = FnReceiveCharacter( );
+                if ( SingleChar != '\n' &&  SingleChar != RESET )
+                   { ReciverBuffer [ReceiveCount] = SingleChar ; ReceiveCount++; }
+                else
+                if ( SingleChar == '\n' )
+                   {
+                      ReciverBuffer [ ReceiveCount ] = SingleChar ;
+                      ReciverBuffer [ ReceiveCount + SET] = RESET ;                     
+                      FnReceiveProcess(ReciverBuffer);
+                      memset(ReciverBuffer,RESET,sizeof(ReciverBuffer));
+                      ReceiveCount =  RESET ;
+                      if (ucMode == _SERAIL_MODE_COMMAND)
+                          FnTransmitCharacter("Enter data: ");               
+                   }
+                  //else FnTransmitCharacter("No data is received!\n\r");    
+            }
+            else
+            {
+                  CodeBuffer[CodeReceiveCount++] = FnReceiveCharacter( );
+              if( CodeReceiveCount == uiCodeSize )
+                { 
+                  FnTransmitCharacter("Code byte is: ");
+                  for (uint32_t ucLoop = RESET; ucLoop < uiCodeSize; ucLoop++ )
+                      {sprintf(cprint,"%c",CodeBuffer[ucLoop]); FnTransmitCharacter(cprint); }                                          
+                  FnTransmitCharacter("\n\r");                                     
+                  CodeReceiveCount = 
+                  uiCodeSize = RESET ; 
+                  ucMode = _SERAIL_MODE_COMMAND ;                  
+                }
+            }
+
+        }
+}
+
 
 /* ----------------------------------------------------------------------------
  *                           Fnction Definitions
  * ----------------------------------------------------------------------------
 */
 /***********************************************************************
- * Function Name: Function1 
- * Arguments	  : void
+ * Function Name: FnTask1, FnTask2, FnTask3, FnTask4
+ * Arguments	: void
  * Return Type	: void
- * Details	    : A callback function
+ * Details	    : print the task number
  * *********************************************************************/
-void CallbackFunction(void)
+int main ( )
 {
-    static int CallbackCount = RESET;
-    CallbackCount++;
-  	printf ("CALLBACK FUNCTION=%d\n\r",CallbackCount);
-}
-
-/***********************************************************************
- * Function Name: DEFINE_INTERRUPT_PERMITTED 
- * Arguments	  : 
- * Return Type	: 
- * Details	    : 
- * *********************************************************************/
-DEFINE_INTERRUPT_PERMITTED(interrupt_handlers, void, interruptable_task, void)
-{
-  interrupt_unmask_all( ); 
-  //interrupt_mask_all( );
-}
-/***********************************************************************
- * Function Name: DEFINE_INTERRUPT_CALLBACK 
- * Arguments	  : 
- * Return Type	: 
- * Details	    : 
- * *********************************************************************/
-DEFINE_INTERRUPT_CALLBACK (interrupt_handlers, interrupt_task, button)
-{
-  //To manipulate the interrupt trigger to get the interrupt on the rising edge only.
-   RisingFallingEdge = !RisingFallingEdge;
-  port_set_trigger_in_not_equal(button1, RisingFallingEdge); //change the trigger for the port/ pin
-  uifeedback = SET & port_peek(button1); //read the current status
-
-  if (( uifeedback == SET ) 
-  &&  ( uiStatus == RESET ))
-      { uiStatus  =   SET;
-
-      }
-
-  else 
-  if (( uifeedback == RESET ) 
-  &&  ( uiStatus   ==   SET )) 
-      { uiStatus    = RESET; 
-        CallbackFunction( );      
-      }
-}
-
-/***********************************************************************
- * Function Name: FnGpioRead 
- * Arguments	  : void
- * Return Type	: int
- * Details	    : 
- * *********************************************************************/
-int FnGpioRead(port_t PortVar)
-{ return port_peek(PortVar); }
-
-/***********************************************************************
- * Function Name: GPIOINTRWrapper 
- * Arguments	  : void
- * Return Type	: void
- * Details	    : 
- * *********************************************************************/
-void GPIOINTRWrapper(void)
-{ INTERRUPT_PERMITTED(interruptable_task)( ); }
-/***********************************************************************
- * Function Name: GPIOInterrupt 
- * Arguments	  : void
- * Return Type	: void
- * Details	    : 
- * *********************************************************************/
-void GPIOInterrupt(void)
-{
-
-  port_enable(button1);
-  triggerable_setup_interrupt_callback
-  (button1, &button1, INTERRUPT_CALLBACK(interrupt_task));
-  port_set_trigger_in_not_equal(button1, RESET);
-  port_clear_trigger_in(button1);
-  triggerable_enable_trigger(button1);
-  GPIOINTRWrapper( ); // if I comment this one here, the interrupt won't work
-  //code is not able to reach here
+   FnTransmitCharacter("code started\n\r");
+   FnCommandReceive();    
+return RESET;
 }

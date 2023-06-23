@@ -97,7 +97,7 @@
 */
 
 	 in port iPort4A = PORT1A ;
-  out port OPort4A = PORT4A ;
+  out port OPort4A = PORT4C ;
   timer timev;
   int64_t CompareTime ;
 
@@ -128,17 +128,17 @@ int main ( )
 
     //taking the current time value
     timev :> CompareTime;
-    printf("Current=%d\tCompare=%d\n\r",timev, CompareTime); 
+   // printf("Current=%d\tCompare=%d\n\r",timev, CompareTime); 
 
     while (SET)
     { 
-      printf("GPIO Turned ON\n\r");
-      CompareTime += ui1Sec ; 
-      OPort4A <: (uint8_t)0x0E ;      
+      //printf("GPIO Turned ON\n\r");
+      CompareTime += ui10mSec ; 
+      OPort4A <: (uint8_t)0x00 ;      
       timev when timerafter(CompareTime) :> void;
 
-      printf("GPIO Turned OFF\n\r");
-      CompareTime += ui1Sec ; 
+      //printf("GPIO Turned OFF\n\r");
+      CompareTime += ui10mSec ; 
       OPort4A <: (uint8_t)0x0F ;      
       timev when timerafter(CompareTime) :> void;
 
